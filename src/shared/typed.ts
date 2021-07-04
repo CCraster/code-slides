@@ -1,4 +1,5 @@
+import { ProjectTreeItem } from './projectTreeItem'
 export interface PlayingStatusInfo {
-  inPlayingNode: any
+  inPlayingNode: ProjectTreeItem
   currentSlideIndex: number
 }

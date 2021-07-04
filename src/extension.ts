@@ -12,12 +12,15 @@ import {
 } from 'vscode'
 import * as path from 'path'
 
-import { SlideExplorer } from './explorer/slideExplorer'
-import { HelpAndFeedbackExplorer } from './explorer/helpAndFeedbackExplorer'
+import { SlideExplorer, HelpAndFeedbackExplorer } from './explorers'
 import { registerCommand } from './registerCommand'
 import { ProjectPlayingStatusBar } from './projectPlayingStatusBar'
+import {
+  wacthEditorSelectionChange,
+  watchActiveTextEditorChange,
+} from './watchers'
 
-let slideTreeView: TreeView<any> | null = null
+let slideTreeView: SlideExplorer | null = null
 let projectPlayingStatusBar: ProjectPlayingStatusBar | null = null
 
 export function activate(context: ExtensionContext) {
@@ -29,6 +32,9 @@ export function activate(context: ExtensionContext) {
   new HelpAndFeedbackExplorer(context)
 
   registerCommand(context, slideTreeView)
+
+  wacthEditorSelectionChange(context)
+  watchActiveTextEditorChange(context)
 
   context.subscriptions.push(
     commands.registerCommand('code-slides.codeSlides', async () => {
@@ -67,8 +73,6 @@ export function activate(context: ExtensionContext) {
         null,
         context.subscriptions,
       )
-
-      console.log('xxx', window.visibleTextEditors[0].visibleRanges)
     }),
   )
 
@@ -79,11 +83,6 @@ export function activate(context: ExtensionContext) {
       let activeEditor: TextEditor | undefined = window.activeTextEditor
       let ranges: Range[] = []
       style.dispose()
-      if (activeEditor) {
-        // ranges.push(activeEditor.document.lineAt(1).range);
-        // ranges.push(new Range(3, 0, 6, 0))
-        activeEditor.setDecorations(style, ranges)
-      }
     }),
   )
 }
