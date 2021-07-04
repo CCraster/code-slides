@@ -18,6 +18,7 @@ export async function highlightEditor(
   slideItem?: ProjectTreeItem | null,
 ): Promise<void> {
   if (slideItem) {
+    unHighlightActiveEditor()
     let uri = Uri.file(slideItem.slideFilePath || '')
     let ranges: Range[] = []
     if (slideItem.slideFilePath !== editor?.document.fileName) {

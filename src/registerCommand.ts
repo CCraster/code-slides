@@ -166,16 +166,19 @@ export function registerCommand(
       const currentOptSlide = GlobalState.getCurrentOptSlide()
       let optProjectId = GlobalState.getCurrentOptProjectId()
 
-      // check if there is slide does not finish add
+      // check if there is slide does not finish edit
       if (currentOptSlide) {
         const confirmText = 'Abondon'
         const abondon = await window.showWarningMessage(
-          `There is a slide does not finish add, abondon that and create a new one?`,
+          `There is a slide does not finish edit, abondon that and create a new one?`,
           { modal: true },
           confirmText,
         )
         if (abondon !== confirmText) {
           return
+        } else {
+          GlobalState.setCurrentOptSlide(null)
+          unHighlightActiveEditor()
         }
       }
 
@@ -223,7 +226,13 @@ export function registerCommand(
           false,
           projects[optProjectIndex].id,
         )
+        projects[optProjectIndex].children.push(slide)
+        CodeSlidesConfig.setProjectsConfig(projects)
         GlobalState.setCurrentOptSlide(slide)
+        slideExplorer.treeView.reveal(slide, {
+          expand: true,
+          focus: true,
+        })
         window.showInformationMessage(
           `Slide ${result} has been created. Now go to record lines you need to highlight`,
         )
@@ -246,13 +255,21 @@ export function registerCommand(
       if (editSlideIndex !== -1) {
         projects[optProjectIndex].children[editSlideIndex].highlightLines =
           currentOptSlide?.highlightLines
+        projects[optProjectIndex].children[editSlideIndex].slideFilePath =
+          currentOptSlide?.slideFilePath
       } else {
+        // never in this logic
         projects[optProjectIndex].children.push(currentOptSlide)
       }
 
       CodeSlidesConfig.setProjectsConfig(projects)
       GlobalState.setCurrentOptSlide(null)
       unHighlightActiveEditor()
+      currentOptSlide &&
+        slideExplorer.treeView.reveal(currentOptSlide, {
+          expand: true,
+          focus: true,
+        })
       window.showInformationMessage(
         `Slide ${currentOptSlide?.title} has been added to [Project ${projects[optProjectIndex].title}]`,
       )
@@ -262,13 +279,34 @@ export function registerCommand(
   commands.registerCommand(
     'code-slides.editSlide',
     async (node: ProjectTreeItem) => {
+      const currentOptSlide = GlobalState.getCurrentOptSlide()
+
+      if (node.id === currentOptSlide?.id) {
+        return
+      }
+
+      // check if there is slide does not finish edit
+      if (currentOptSlide) {
+        const confirmText = 'Abondon'
+        const abondon = await window.showWarningMessage(
+          `There is a slide does not finish edit, abondon that and create a new one?`,
+          { modal: true },
+          confirmText,
+        )
+        if (abondon !== confirmText) {
+          return
+        } else {
+          GlobalState.setCurrentOptSlide(null)
+          unHighlightActiveEditor()
+        }
+      }
+
       GlobalState.setCurrentOptProjectId(node.parentId || null)
       GlobalState.setCurrentOptSlide(node)
-
-      await openFile(Uri.file(node.slideFilePath))
+      await openFile(node.slideFilePath)
       highlightEditor(window.activeTextEditor, node)
 
-      window.showInformationMessage(`[Slide ${node.title}\ is in editing`)
+      window.showInformationMessage(`[Slide ${node.title}] is in editing`)
     },
   )
 
@@ -338,6 +376,14 @@ export function registerCommand(
     },
   )
 
+  commands.registerCommand(
+    'code-slides.clickSlide',
+    async (node: ProjectTreeItem) => {
+      await openFile(node.slideFilePath)
+      highlightEditor(window.activeTextEditor, node)
+    },
+  )
+
   /**
    * command about project play
    */
@@ -352,7 +398,7 @@ export function registerCommand(
           currentSlideIndex: 0,
         })
         GlobalState.setCurrentOptProjectId(node.id)
-        await openFile(Uri.file(node.children[0].slideFilePath))
+        await openFile(node.children[0].slideFilePath)
         highlightEditor(window.activeTextEditor, node.children[0])
         window.showInformationMessage(`Project ${optNodeName} is now playing`)
       } else {
@@ -392,9 +438,7 @@ export function registerCommand(
         currentSlideIndex: childIndex,
       })
       GlobalState.setCurrentOptProjectId(projects[parentIndex].id)
-      await openFile(
-        Uri.file(projects[parentIndex].children[childIndex].slideFilePath),
-      )
+      await openFile(projects[parentIndex].children[childIndex].slideFilePath)
       highlightEditor(
         window.activeTextEditor,
         projects[parentIndex].children[childIndex],
@@ -417,9 +461,7 @@ export function registerCommand(
         currentSlideIndex: preSlideIndex,
       })
       await openFile(
-        Uri.file(
-          playStatusInfo.inPlayingNode.children[preSlideIndex].slideFilePath,
-        ),
+        playStatusInfo.inPlayingNode.children[preSlideIndex].slideFilePath,
       )
       highlightEditor(
         window.activeTextEditor,
@@ -444,9 +486,7 @@ export function registerCommand(
         currentSlideIndex: nextSlideIndex,
       })
       await openFile(
-        Uri.file(
-          playStatusInfo.inPlayingNode.children[nextSlideIndex].slideFilePath,
-        ),
+        playStatusInfo.inPlayingNode.children[nextSlideIndex].slideFilePath,
       )
       highlightEditor(
         window.activeTextEditor,

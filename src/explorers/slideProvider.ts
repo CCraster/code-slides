@@ -3,7 +3,6 @@ import {
   EventEmitter,
   TreeDataProvider,
   TreeItem,
-  MarkdownString,
   TreeItemCollapsibleState,
   workspace,
   ConfigurationChangeEvent,
@@ -30,12 +29,25 @@ export class SlideProvider implements TreeDataProvider<any> {
   getChildren(
     element: ProjectTreeItem,
   ): ProjectTreeItem[] | Thenable<ProjectTreeItem[]> {
-    const slides = CodeSlidesConfig.getProjectsConfig()
+    const projects = CodeSlidesConfig.getProjectsConfig()
 
     if (!element) {
-      return slides
+      return projects
     } else {
       return element.children || []
+    }
+  }
+
+  getParent(element: ProjectTreeItem) {
+    const projects = CodeSlidesConfig.getProjectsConfig()
+
+    if (element.isProject) {
+      return null
+    } else {
+      const parentNode = projects.find(
+        (item: ProjectTreeItem) => item.id === element.parentId,
+      )
+      return parentNode
     }
   }
 
@@ -72,6 +84,14 @@ export class SlideProvider implements TreeDataProvider<any> {
                 ),
               }
             : undefined,
+        contextValue:
+          element.id === currentOptSlide?.id ? 'slide-editing' : 'slide',
+        command: {
+          title: 'Show Slide Content',
+          command: 'code-slides.clickSlide',
+          arguments: [element],
+        },
+        tooltip: element.slideFilePath,
       }
     } else {
       return {
@@ -98,10 +118,10 @@ export class SlideProvider implements TreeDataProvider<any> {
                 ),
               }
             : undefined,
-        collapsibleState:
-          element.id === currentOptProjectId
-            ? TreeItemCollapsibleState.Expanded
-            : TreeItemCollapsibleState.Collapsed,
+        // collapsibleState:
+        //   element.id === currentOptProjectId
+        //     ? TreeItemCollapsibleState.Expanded
+        //     : TreeItemCollapsibleState.Collapsed,
         command: undefined,
         contextValue:
           element.id === playingStatusInfo?.inPlayingNode?.id

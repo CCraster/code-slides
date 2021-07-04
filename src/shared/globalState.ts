@@ -35,7 +35,7 @@ export class GlobalState {
     return this.currentOptSlide
   }
   static setCurrentOptSlide(slide: ProjectTreeItem | null): void {
-    this.currentOptSlide = slide
+    this.currentOptSlide = slide ? { ...slide } : null
     commands.executeCommand('setContext', 'code-slides.currentOptSlide', slide)
     events.emit('updateCurrentOptSlide', this.currentOptSlide)
   }

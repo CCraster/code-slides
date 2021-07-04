@@ -38,11 +38,11 @@ export class ProjectPlayingStatusBar {
   updatePlayingStatusBarItem() {
     const playStatusInfo = GlobalState.getInPlayingStatusInfo()
     const currentOptProjectId = GlobalState.getCurrentOptProjectId()
-    console.log(
-      'xxx updatePlayingStatusBarItem',
-      playStatusInfo,
-      currentOptProjectId,
-    )
+    // console.log(
+    //   'xxx updatePlayingStatusBarItem',
+    //   playStatusInfo,
+    //   currentOptProjectId,
+    // )
 
     if (this.playingStatusBarItem) {
       if (playStatusInfo) {

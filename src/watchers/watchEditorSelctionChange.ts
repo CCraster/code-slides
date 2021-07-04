@@ -25,14 +25,12 @@ function handleSlideRelativeSelectionChange(
 ): void {
   const currentOptSlide = GlobalState.getCurrentOptSlide()
   const slideHighlightLines = new Set<number>()
+
   // set slideFilePath
   currentOptSlide &&
     window.activeTextEditor?.document.fileName &&
     (currentOptSlide.slideFilePath = window.activeTextEditor?.document.fileName)
-  // console.log(
-  //   'xxx activeTextEditor',
-  //   window.activeTextEditor?.document.fileName,
-  // )
+
   // record line num
   selections.forEach((selection) => {
     for (let i: number = selection.start.line; i <= selection.end.line; i++) {
@@ -43,8 +41,6 @@ function handleSlideRelativeSelectionChange(
     (currentOptSlide.highlightLines = Array.from(slideHighlightLines))
 
   highlightEditor(window.activeTextEditor, currentOptSlide)
-
-  console.log('xxx currentOptSlide', GlobalState.getCurrentOptSlide())
 }
 
 /**

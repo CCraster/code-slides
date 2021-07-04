@@ -55,14 +55,6 @@
     ],
     "commands": [
       {
-        "command": "code-slides.codeSlides",
-        "title": "Code Slides: Start Presentation"
-      },
-      {
-        "command": "code-slides.stopPresentation",
-        "title": "Code Slides: Stop Presentation"
-      },
-      {
         "command": "code-slides.setOptProject",
         "title": "Set Operation Project"
       },
@@ -130,6 +122,10 @@
         "command": "code-slides.deleteSlide",
         "title": "Delete Slide",
         "enablement": "!code-slides.playStatusInfo"
+      },
+      {
+        "command": "code-slides.clickSlide",
+        "title": "Show Slide Content"
       },
       {
         "command": "code-slides.playProjectFromStart",
@@ -208,13 +204,8 @@
       "view/item/context": [
         {
           "command": "code-slides.addSlideStart",
-          "when": "view == codeSlidesView.projects && viewItem =~ /^project$|^project-playing$/",
+          "when": "view == codeSlidesView.projects && viewItem =~ /^project/",
           "group": "inline@1"
-        },
-        {
-          "command": "code-slides.addSlideEnd",
-          "when": "view == codeSlidesView.projects && viewItem == project-adding",
-          "group": "inline@2"
         },
         {
           "command": "code-slides.playProjectFromStart",
@@ -248,27 +239,32 @@
         },
         {
           "command": "code-slides.editSlide",
-          "when": "view == codeSlidesView.projects && !viewItem",
+          "when": "view == codeSlidesView.projects && viewItem =~ /^slide$/",
           "group": "inline@1"
         },
         {
-          "command": "code-slides.playProjectFromHere",
-          "when": "view == codeSlidesView.projects && !viewItem",
+          "command": "code-slides.addSlideEnd",
+          "when": "view == codeSlidesView.projects && viewItem == slide-editing",
           "group": "inline@2"
         },
         {
+          "command": "code-slides.playProjectFromHere",
+          "when": "view == codeSlidesView.projects && viewItem =~ /^slide/",
+          "group": "inline@3"
+        },
+        {
           "command": "code-slides.editSlide",
-          "when": "view == codeSlidesView.projects && !viewItem",
+          "when": "view == codeSlidesView.projects && viewItem =~ /^slide/",
           "group": "group1@1"
         },
         {
           "command": "code-slides.renameSlide",
-          "when": "view == codeSlidesView.projects && !viewItem",
+          "when": "view == codeSlidesView.projects && viewItem =~ /^slide/",
           "group": "group1@2"
         },
         {
           "command": "code-slides.deleteSlide",
-          "when": "view == codeSlidesView.projects && !viewItem",
+          "when": "view == codeSlidesView.projects && viewItem =~ /^slide$/",
           "group": "group2"
         }
       ]
