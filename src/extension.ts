@@ -2,7 +2,7 @@ import { ExtensionContext } from 'vscode'
 
 import { SlideExplorer, HelpAndFeedbackExplorer } from './explorers'
 import { registerCommand } from './registerCommand'
-import { ProjectPlayingStatusBar } from './projectPlayingStatusBar'
+import { ProjectPlayingStatusBar } from './codeSlidesStatusBar'
 import {
   wacthEditorSelectionChange,
   watchActiveTextEditorChange,

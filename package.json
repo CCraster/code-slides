@@ -10,6 +10,14 @@
   "categories": [
     "Other"
   ],
+  "keywords": [
+    "code",
+    "slide",
+    "presentation",
+    "project",
+    "show",
+    "display"
+  ],
   "icon": "images/logo.png",
   "license": "SEE LICENSE IN LICENSE",
   "homepage": "https://github.com/CCraster/code-slides/blob/master/README.md",
@@ -22,7 +30,7 @@
   },
   "activationEvents": [
     "*",
-    "onCommand:code-slides.codeSlides"
+    "onCommand:code-slides.addProject"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -51,10 +59,14 @@
     "viewsWelcome": [
       {
         "view": "codeSlidesView.projects",
-        "contents": "add new code-slides project"
+        "contents": "There is no code-slides project now.\n [Create Project](command:code-slides.addProject)"
       }
     ],
     "commands": [
+      {
+        "command": "code-slides.deleteAllProject",
+        "title": "Delete All Project"
+      },
       {
         "command": "code-slides.setOptProject",
         "title": "Set Operation Project"
@@ -63,8 +75,8 @@
         "command": "code-slides.addProject",
         "title": "Code Slides: New Project",
         "icon": {
-          "light": "images/light/add.svg",
-          "dark": "images/dark/add.svg"
+          "light": "images/light/add-project.svg",
+          "dark": "images/dark/add-project.svg"
         },
         "enablement": "!code-slides.playStatusInfo"
       },
@@ -91,8 +103,8 @@
         "command": "code-slides.addSlideStart",
         "title": "Code Slides: Add Slide",
         "icon": {
-          "light": "images/light/add.svg",
-          "dark": "images/dark/add.svg"
+          "light": "images/light/add-slide.svg",
+          "dark": "images/dark/add-slide.svg"
         },
         "enablement": "!code-slides.playStatusInfo"
       },
@@ -200,6 +212,9 @@
           "command": "code-slides.addProject",
           "when": "view == codeSlidesView.projects",
           "group": "navigation@1"
+        },
+        {
+          "command": "code-slides.deleteAllProject"
         }
       ],
       "view/item/context": [
@@ -307,11 +322,47 @@
       }
     ],
     "configuration": {
+      "type": "object",
+      "title": "Code Slides",
       "properties": {
-        "code-slides.projects": {
-          "type": "array",
-          "default": [],
-          "description": "slides data(strongly recommand add it via interface)"
+        "code-slides.highlightMode": {
+          "type": "string",
+          "default": "Weaken Unhighliht Line",
+          "enum": [
+            "Weaken Unhighliht Line",
+            "Strengthen Highliht Line",
+            "Both"
+          ],
+          "enumDescriptions": [
+            "weaken lines that you don not want to highlight with specific color",
+            "strengthen lines that you want to highlight with specific color",
+            "weaken lines you don not want to highlight & strengthen lines you want to highlight"
+          ]
+        },
+        "code-slides.lineWeakenColor": {
+          "type": "string",
+          "default": "rgba(255, 255, 255, 0.2)",
+          "description": "color use to weaken lines that you don not want to highlight"
+        },
+        "code-slides.lineStrengthenColor": {
+          "type": "string",
+          "default": "#f00",
+          "description": "color use to strengthen lines that you want to highlight"
+        },
+        "code-slides.hideStatusBar": {
+          "type": "boolean",
+          "default": false,
+          "description": "hide code-clides staus bar(not recommend)"
+        },
+        "code-slides.statusBarNormalColor": {
+          "type": "string",
+          "default": "#fff",
+          "description": "status bar normal color"
+        },
+        "code-slides.statusBarPlayingColor": {
+          "type": "string",
+          "default": "#0f0",
+          "description": "status bar color while project is playing"
         }
       }
     }

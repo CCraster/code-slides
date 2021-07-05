@@ -7,7 +7,7 @@ import {
   ConfigurationChangeEvent,
 } from 'vscode'
 import * as path from 'path'
-import { CodeSlidesConfig } from '../shared/slideConfig'
+import { CodeSlidesConfig } from '../shared/codeSlidesConfig'
 import { CodeSlidesProjectData } from '../shared/dataHelper'
 import { events } from '../shared/utils'
 import { GlobalState } from '../shared/globalState'

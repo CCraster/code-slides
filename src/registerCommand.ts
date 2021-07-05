@@ -1,6 +1,6 @@
 import { ExtensionContext, commands, window } from 'vscode'
 import { SlideExplorer } from './explorers/slideExplorer'
-import { CodeSlidesConfig } from './shared/slideConfig'
+import { CodeSlidesConfig } from './shared/codeSlidesConfig'
 import { CodeSlidesProjectData } from './shared/dataHelper'
 import { GlobalState } from './shared/globalState'
 import { PlayingStatusInfo } from './shared/typed'
@@ -20,6 +20,26 @@ export function registerCommand(
   /**
    * command about project
    */
+  commands.registerCommand('code-slides.deleteAllProject', async () => {
+    const projects = CodeSlidesProjectData.getProjects()
+    const deleteAllConfirmText = 'Delete Anyway'
+    if (!projects.length) {
+      window.showWarningMessage('There is no project')
+      return
+    }
+
+    const result = await window.showWarningMessage(
+      `Are you really want to delete all projects? data can not recover after delete!`,
+      { modal: true },
+      deleteAllConfirmText,
+    )
+
+    if (result === deleteAllConfirmText) {
+      CodeSlidesProjectData.setProjects([])
+      window.showInformationMessage(`All projects are deleted`)
+    }
+  })
+
   commands.registerCommand('code-slides.setOptProject', async () => {
     const projects = CodeSlidesProjectData.getProjects()
     const quickPickItems = projects.map((item: ProjectTreeItem) => {
@@ -286,40 +306,45 @@ export function registerCommand(
     window.showInformationMessage(
       `Slide ${currentOptSlide?.title} has been added to [Project ${projects[optProjectIndex].title}]`,
     )
-  }),
-    commands.registerCommand(
-      'code-slides.editSlide',
-      async (node: ProjectTreeItem) => {
-        const currentOptSlide = GlobalState.getCurrentOptSlide()
+  })
 
-        if (node.id === currentOptSlide?.id) {
+  commands.registerCommand(
+    'code-slides.editSlide',
+    async (node: ProjectTreeItem) => {
+      const currentOptSlide = GlobalState.getCurrentOptSlide()
+
+      if (node.id === currentOptSlide?.id) {
+        return
+      }
+
+      // check if there is slide does not finish edit
+      if (currentOptSlide) {
+        const confirmText = 'Abondon'
+        const abondon = await window.showWarningMessage(
+          `There is a slide does not finish edit, abondon that and create a new one?`,
+          { modal: true },
+          confirmText,
+        )
+        if (abondon !== confirmText) {
           return
+        } else {
+          GlobalState.setCurrentOptSlide(null)
+          unHighlightActiveEditor()
         }
+      }
 
-        // check if there is slide does not finish edit
-        if (currentOptSlide) {
-          const confirmText = 'Abondon'
-          const abondon = await window.showWarningMessage(
-            `There is a slide does not finish edit, abondon that and create a new one?`,
-            { modal: true },
-            confirmText,
-          )
-          if (abondon !== confirmText) {
-            return
-          } else {
-            GlobalState.setCurrentOptSlide(null)
-            unHighlightActiveEditor()
-          }
-        }
+      GlobalState.setCurrentOptProjectId(node.parentId || null)
+      GlobalState.setCurrentOptSlide(node)
+      await openNewEditor(node.slideFilePath)
+      highlightEditor(window.activeTextEditor, node)
+      slideExplorer.treeView.reveal(node, {
+        expand: true,
+        focus: true,
+      })
 
-        GlobalState.setCurrentOptProjectId(node.parentId || null)
-        GlobalState.setCurrentOptSlide(node)
-        await openNewEditor(node.slideFilePath)
-        highlightEditor(window.activeTextEditor, node)
-
-        window.showInformationMessage(`[Slide ${node.title}] is in editing`)
-      },
-    )
+      window.showInformationMessage(`[Slide ${node.title}] is in editing`)
+    },
+  )
 
   commands.registerCommand(
     'code-slides.renameSlide',
@@ -352,6 +377,10 @@ export function registerCommand(
         )
         projects[parentIndex].children[childIndex].title = result
         CodeSlidesProjectData.setProjects(projects)
+        slideExplorer.treeView.reveal(node, {
+          expand: true,
+          focus: true,
+        })
         window.showInformationMessage(
           `[Slide ${optNodeTitle}] has been renamed to ${result}`,
         )
@@ -392,6 +421,10 @@ export function registerCommand(
   commands.registerCommand(
     'code-slides.clickSlide',
     async (node: ProjectTreeItem) => {
+      slideExplorer.treeView.reveal(node, {
+        expand: true,
+        focus: true,
+      })
       GlobalState.setCurrentOptProjectId(node.parentId || null)
       await openNewEditor(node.slideFilePath)
       highlightEditor(window.activeTextEditor, node)
@@ -491,6 +524,13 @@ export function registerCommand(
       highlightEditor(
         window.activeTextEditor,
         projects[parentIndex].children[childIndex],
+      )
+      slideExplorer.treeView.reveal(
+        projects[parentIndex].children[childIndex],
+        {
+          expand: true,
+          focus: true,
+        },
       )
       window.showInformationMessage(`Now is changed to slide ${optNodeTitle}`)
     },

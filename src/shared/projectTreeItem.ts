@@ -9,7 +9,7 @@ export class ProjectTreeItem extends TreeItem {
   desc: string = ''
   contextValue: string = ''
   parentId: string | undefined
-  highlightLines: Array<number> = [] // for slide item
+  highlightLines: Array<Array<number>> = [] // for slide item
   slideFilePath: string = '' // for slide item
 
   constructor(title: string, isProject: boolean, parentId?: string) {
