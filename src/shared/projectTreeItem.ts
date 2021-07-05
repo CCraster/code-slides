@@ -3,11 +3,11 @@ import { genUniqueId } from '../shared/utils'
 
 export class ProjectTreeItem extends TreeItem {
   id: string = ''
-  title: string | undefined
+  title: string = ''
   isProject: boolean = false
   children: Array<ProjectTreeItem> = []
-  desc: string | undefined
-  contextValue: string | undefined
+  desc: string = ''
+  contextValue: string = ''
   parentId: string | undefined
   highlightLines: Array<number> = [] // for slide item
   slideFilePath: string = '' // for slide item

@@ -3,8 +3,8 @@ import { events } from './shared/utils'
 import { GlobalState } from './shared/globalState'
 import { CodeSlidesConfig } from './shared/slideConfig'
 
-const noPlayingProjectText = 'No Playing Project'
-const noPlayingColor = '#fff'
+const normalStatusText = 'No Project in Working'
+const normalStatusColor = '#fff'
 const playingColor = '#0f0'
 
 export class ProjectPlayingStatusBar {
@@ -20,8 +20,8 @@ export class ProjectPlayingStatusBar {
       StatusBarAlignment.Left,
       2,
     )
-    this.playingStatusBarItem.text = noPlayingProjectText
-    this.playingStatusBarItem.color = noPlayingColor
+    this.playingStatusBarItem.text = normalStatusText
+    this.playingStatusBarItem.color = normalStatusColor
     this.playingStatusBarItem.show()
 
     const statusBarUpdateHandler = () => {
@@ -57,11 +57,11 @@ export class ProjectPlayingStatusBar {
         const optProject = projects.find(
           (item: any) => item.id === currentOptProjectId,
         )
-        this.playingStatusBarItem.text = `Working on: ${optProject.title}`
-        this.playingStatusBarItem.color = noPlayingColor
+        this.playingStatusBarItem.text = `👀: ${optProject.title}`
+        this.playingStatusBarItem.color = normalStatusColor
       } else {
-        this.playingStatusBarItem.text = noPlayingProjectText
-        this.playingStatusBarItem.color = noPlayingColor
+        this.playingStatusBarItem.text = normalStatusText
+        this.playingStatusBarItem.color = normalStatusColor
       }
       this.playingStatusBarItem.show()
     }
