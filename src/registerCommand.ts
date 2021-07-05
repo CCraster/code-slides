@@ -165,156 +165,155 @@ export function registerCommand(
   /**
    * command about slide
    */
-  commands.registerCommand(
-    'code-slides.addSlideStart',
-    async (node: ProjectTreeItem) => {
-      const projects = CodeSlidesConfig.getProjectsConfig()
-      const currentOptSlide = GlobalState.getCurrentOptSlide()
-      let optProjectId = GlobalState.getCurrentOptProjectId()
+  context.subscriptions.push(
+    commands.registerCommand(
+      'code-slides.addSlideStart',
+      async (node?: ProjectTreeItem) => {
+        const projects = CodeSlidesConfig.getProjectsConfig()
+        const currentOptSlide = GlobalState.getCurrentOptSlide()
+        let optProjectId = GlobalState.getCurrentOptProjectId()
 
-      // check if there is slide does not finish edit
-      if (currentOptSlide) {
-        const confirmText = 'Abondon'
-        const abondon = await window.showWarningMessage(
-          `There is a slide does not finish edit, abondon that and create a new one?`,
-          { modal: true },
-          confirmText,
-        )
-        if (abondon !== confirmText) {
-          return
-        } else {
-          GlobalState.setCurrentOptSlide(null)
-          unHighlightActiveEditor()
-        }
-      }
-
-      // ensure there is a opt project when add a slide
-      if (node.id) {
-        GlobalState.setCurrentOptProjectId(node.id)
-        optProjectId = node.id
-      } else if (!optProjectId) {
-        const selectedOptProject: any = await commands.executeCommand(
-          'code-slides.setOptProject',
-        )
-        if (selectedOptProject) {
-          GlobalState.setCurrentOptProjectId(selectedOptProject.id)
-          optProjectId = selectedOptProject.id
-        } else {
-          window.showWarningMessage(
-            `Add slide need to set operation Project first`,
+        // check if there is slide does not finish edit
+        if (currentOptSlide) {
+          const confirmText = 'Abondon'
+          const abondon = await window.showWarningMessage(
+            `There is a slide does not finish edit, abondon that and create a new one?`,
+            { modal: true },
+            confirmText,
           )
-          return
+          if (abondon !== confirmText) {
+            return
+          } else {
+            GlobalState.setCurrentOptSlide(null)
+            unHighlightActiveEditor()
+          }
         }
-      }
 
-      const optProjectIndex = projects.findIndex(
-        (item: ProjectTreeItem) => item.id === optProjectId,
-      )
+        // ensure there is a opt project when add a slide
+        if (node?.id) {
+          GlobalState.setCurrentOptProjectId(node.id)
+          optProjectId = node.id
+        } else if (!optProjectId) {
+          const selectedOptProject: any = await commands.executeCommand(
+            'code-slides.setOptProject',
+          )
+          if (selectedOptProject) {
+            GlobalState.setCurrentOptProjectId(selectedOptProject.id)
+            optProjectId = selectedOptProject.id
+          } else {
+            projects.length &&
+              window.showWarningMessage(
+                `Add slide need to set operation Project first`,
+              )
+            return
+          }
+        }
 
-      const result = await window.showInputBox({
-        value: '',
-        placeHolder:
-          'For example: how to use code-slides 1. But not be empty string',
-        validateInput: (text) => {
-          return text.trim() === ''
-            ? 'empty string or all blank is illegal'
-            : projects[optProjectIndex].children.findIndex(
-                (item: any) => item.id === text,
-              ) !== -1
-            ? 'the slide name has been used'
-            : null
-        },
+        const optProjectIndex = projects.findIndex(
+          (item: ProjectTreeItem) => item.id === optProjectId,
+        )
+
+        const result = await window.showInputBox({
+          value: '',
+          placeHolder:
+            'For example: how to use code-slides 1. But not be empty string',
+          validateInput: (text) => {
+            return text.trim() === ''
+              ? 'empty string or all blank is illegal'
+              : projects[optProjectIndex].children.findIndex(
+                  (item: any) => item.id === text,
+                ) !== -1
+              ? 'the slide name has been used'
+              : null
+          },
+        })
+
+        if (result !== undefined) {
+          const slide = new ProjectTreeItem(
+            result,
+            false,
+            projects[optProjectIndex].id,
+          )
+          projects[optProjectIndex].children.push(slide)
+          await CodeSlidesConfig.setProjectsConfig(projects)
+          GlobalState.setCurrentOptSlide(slide)
+          slideExplorer.treeView.reveal(slide, {
+            expand: true,
+            focus: true,
+          })
+          window.showInformationMessage(
+            `[Slide ${result}] has been created. Now go to record lines you need to highlight`,
+          )
+        }
+      },
+    ),
+  )
+
+  commands.registerCommand('code-slides.addSlideEnd', async () => {
+    const projects = CodeSlidesConfig.getProjectsConfig()
+    const currentOptSlide = GlobalState.getCurrentOptSlide()
+    let optProjectId = GlobalState.getCurrentOptProjectId()
+    const optProjectIndex = projects.findIndex(
+      (item: ProjectTreeItem) => item.id === optProjectId,
+    )
+    const editSlideIndex = projects[optProjectIndex].children.findIndex(
+      (item: ProjectTreeItem) => item.id === currentOptSlide?.id,
+    )
+    if (editSlideIndex !== -1) {
+      projects[optProjectIndex].children[editSlideIndex].highlightLines =
+        currentOptSlide?.highlightLines
+      projects[optProjectIndex].children[editSlideIndex].slideFilePath =
+        currentOptSlide?.slideFilePath
+    } else {
+      // never in this logic
+      projects[optProjectIndex].children.push(currentOptSlide)
+    }
+
+    await CodeSlidesConfig.setProjectsConfig(projects)
+    GlobalState.setCurrentOptSlide(null)
+    unHighlightActiveEditor()
+    currentOptSlide &&
+      slideExplorer.treeView.reveal(currentOptSlide, {
+        expand: true,
+        focus: true,
       })
+    window.showInformationMessage(
+      `Slide ${currentOptSlide?.title} has been added to [Project ${projects[optProjectIndex].title}]`,
+    )
+  }),
+    commands.registerCommand(
+      'code-slides.editSlide',
+      async (node: ProjectTreeItem) => {
+        const currentOptSlide = GlobalState.getCurrentOptSlide()
 
-      if (result !== undefined) {
-        const slide = new ProjectTreeItem(
-          result,
-          false,
-          projects[optProjectIndex].id,
-        )
-        projects[optProjectIndex].children.push(slide)
-        await CodeSlidesConfig.setProjectsConfig(projects)
-        GlobalState.setCurrentOptSlide(slide)
-        slideExplorer.treeView.reveal(slide, {
-          expand: true,
-          focus: true,
-        })
-        window.showInformationMessage(
-          `Slide ${result} has been created. Now go to record lines you need to highlight`,
-        )
-      }
-    },
-  )
-
-  commands.registerCommand(
-    'code-slides.addSlideEnd',
-    async (node: ProjectTreeItem) => {
-      const projects = CodeSlidesConfig.getProjectsConfig()
-      const currentOptSlide = GlobalState.getCurrentOptSlide()
-      let optProjectId = GlobalState.getCurrentOptProjectId()
-      const optProjectIndex = projects.findIndex(
-        (item: ProjectTreeItem) => item.id === optProjectId,
-      )
-      const editSlideIndex = projects[optProjectIndex].children.findIndex(
-        (item: ProjectTreeItem) => item.id === currentOptSlide?.id,
-      )
-      if (editSlideIndex !== -1) {
-        projects[optProjectIndex].children[editSlideIndex].highlightLines =
-          currentOptSlide?.highlightLines
-        projects[optProjectIndex].children[editSlideIndex].slideFilePath =
-          currentOptSlide?.slideFilePath
-      } else {
-        // never in this logic
-        projects[optProjectIndex].children.push(currentOptSlide)
-      }
-
-      await CodeSlidesConfig.setProjectsConfig(projects)
-      GlobalState.setCurrentOptSlide(null)
-      unHighlightActiveEditor()
-      currentOptSlide &&
-        slideExplorer.treeView.reveal(currentOptSlide, {
-          expand: true,
-          focus: true,
-        })
-      window.showInformationMessage(
-        `Slide ${currentOptSlide?.title} has been added to [Project ${projects[optProjectIndex].title}]`,
-      )
-    },
-  )
-
-  commands.registerCommand(
-    'code-slides.editSlide',
-    async (node: ProjectTreeItem) => {
-      const currentOptSlide = GlobalState.getCurrentOptSlide()
-
-      if (node.id === currentOptSlide?.id) {
-        return
-      }
-
-      // check if there is slide does not finish edit
-      if (currentOptSlide) {
-        const confirmText = 'Abondon'
-        const abondon = await window.showWarningMessage(
-          `There is a slide does not finish edit, abondon that and create a new one?`,
-          { modal: true },
-          confirmText,
-        )
-        if (abondon !== confirmText) {
+        if (node.id === currentOptSlide?.id) {
           return
-        } else {
-          GlobalState.setCurrentOptSlide(null)
-          unHighlightActiveEditor()
         }
-      }
 
-      GlobalState.setCurrentOptProjectId(node.parentId || null)
-      GlobalState.setCurrentOptSlide(node)
-      await openFile(node.slideFilePath)
-      highlightEditor(window.activeTextEditor, node)
+        // check if there is slide does not finish edit
+        if (currentOptSlide) {
+          const confirmText = 'Abondon'
+          const abondon = await window.showWarningMessage(
+            `There is a slide does not finish edit, abondon that and create a new one?`,
+            { modal: true },
+            confirmText,
+          )
+          if (abondon !== confirmText) {
+            return
+          } else {
+            GlobalState.setCurrentOptSlide(null)
+            unHighlightActiveEditor()
+          }
+        }
 
-      window.showInformationMessage(`[Slide ${node.title}] is in editing`)
-    },
-  )
+        GlobalState.setCurrentOptProjectId(node.parentId || null)
+        GlobalState.setCurrentOptSlide(node)
+        await openFile(node.slideFilePath)
+        highlightEditor(window.activeTextEditor, node)
+
+        window.showInformationMessage(`[Slide ${node.title}] is in editing`)
+      },
+    )
 
   commands.registerCommand(
     'code-slides.renameSlide',
@@ -396,37 +395,70 @@ export function registerCommand(
   /**
    * command about project play
    */
-  commands.registerCommand(
-    'code-slides.playProjectFromStart',
-    async (node: ProjectTreeItem) => {
-      const optNodeName = node.title
+  context.subscriptions.push(
+    commands.registerCommand(
+      'code-slides.playProjectFromStart',
+      async (node?: ProjectTreeItem) => {
+        let toPlayProjectNode: ProjectTreeItem | null = null
+        const projects = CodeSlidesConfig.getProjectsConfig()
+        const currentOptProjectId = GlobalState.getCurrentOptProjectId()
+        if (node) {
+          toPlayProjectNode = node
+        } else if (currentOptProjectId) {
+          toPlayProjectNode = projects.find(
+            (item: ProjectTreeItem) => item.id === currentOptProjectId,
+          )
+        } else {
+          const selectedOptProject: any = await commands.executeCommand(
+            'code-slides.setOptProject',
+          )
+          if (selectedOptProject) {
+            GlobalState.setCurrentOptProjectId(selectedOptProject.id)
+            toPlayProjectNode = selectedOptProject
+          } else {
+            projects.length &&
+              window.showWarningMessage(
+                `You need to set operation Project first`,
+              )
+            return
+          }
+        }
 
-      if (node.children.length) {
-        GlobalState.setInPlayingStatusInfo({
-          inPlayingNode: node,
-          currentSlideIndex: 0,
-        })
-        GlobalState.setCurrentOptProjectId(node.id)
-        await openFile(node.children[0].slideFilePath)
-        highlightEditor(window.activeTextEditor, node.children[0])
-        window.showInformationMessage(`Project ${optNodeName} is now playing`)
-      } else {
-        window.showWarningMessage(
-          `Project ${optNodeName} has no slide yet. Try to add one`,
-        )
-      }
-    },
+        if (toPlayProjectNode) {
+          const optNodeName = toPlayProjectNode.title
+          if (toPlayProjectNode.children.length) {
+            GlobalState.setInPlayingStatusInfo({
+              inPlayingNode: toPlayProjectNode,
+              currentSlideIndex: 0,
+            })
+            GlobalState.setCurrentOptProjectId(toPlayProjectNode.id)
+            await openFile(toPlayProjectNode.children[0].slideFilePath)
+            highlightEditor(
+              window.activeTextEditor,
+              toPlayProjectNode.children[0],
+            )
+            window.showInformationMessage(
+              `Project ${optNodeName} is now playing`,
+            )
+          } else {
+            window.showWarningMessage(
+              `Project ${optNodeName} has no slide yet. Try to add one`,
+            )
+          }
+        }
+      },
+    ),
   )
 
-  commands.registerCommand(
-    'code-slides.stopPlayProject',
-    async (node: ProjectTreeItem) => {
-      const optNodeName = node.title
-
-      GlobalState.setInPlayingStatusInfo(null)
-      unHighlightActiveEditor()
-      window.showInformationMessage(`code-slides has stoped play mode`)
-    },
+  context.subscriptions.push(
+    commands.registerCommand(
+      'code-slides.stopPlayProject',
+      async (node: ProjectTreeItem) => {
+        GlobalState.setInPlayingStatusInfo(null)
+        unHighlightActiveEditor()
+        window.showInformationMessage(`code-slides has stoped play mode`)
+      },
+    ),
   )
 
   commands.registerCommand(

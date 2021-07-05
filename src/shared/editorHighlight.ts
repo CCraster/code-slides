@@ -5,6 +5,7 @@ import {
   TextEditor,
   Range,
   TextEditorDecorationType,
+  TextEditorRevealType,
 } from 'vscode'
 import { ProjectTreeItem } from './projectTreeItem'
 
@@ -15,23 +16,26 @@ export let highlightStyle: TextEditorDecorationType =
 
 export async function highlightEditor(
   editor: TextEditor | undefined = window.activeTextEditor,
-  slideItem?: ProjectTreeItem | null,
+  slideItem: ProjectTreeItem | null,
 ): Promise<void> {
-  if (slideItem) {
+  if (editor && slideItem) {
     unHighlightActiveEditor()
-    let uri = Uri.file(slideItem.slideFilePath || '')
     let ranges: Range[] = []
-    if (slideItem.slideFilePath !== editor?.document.fileName) {
-      return
-    }
-    if (editor && slideItem.slideFilePath === editor?.document.fileName) {
+    if (slideItem.slideFilePath === editor?.document.fileName) {
       const ducumentTotalLine = editor.document.lineCount
-      const slideHighLines = new Set(slideItem.highlightLines)
+      const slideHighlightLines = new Set(slideItem.highlightLines)
+      const minLineNum = Math.min(...slideHighlightLines) || 0
       for (let i: number = 0; i < ducumentTotalLine; i++) {
-        if (!slideHighLines.has(i)) {
+        if (!slideHighlightLines.has(i)) {
           ranges.push(new Range(i, 0, i + 1, 0))
         }
       }
+      // scroll highlight code to editor view center
+      editor.revealRange(
+        new Range(minLineNum, 0, minLineNum + 1, 0),
+        TextEditorRevealType.InCenterIfOutsideViewport,
+      )
+      // highlight lines
       editor.setDecorations(highlightStyle, ranges)
       // style.dispose()
     }

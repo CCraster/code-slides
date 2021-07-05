@@ -88,7 +88,7 @@
       },
       {
         "command": "code-slides.addSlideStart",
-        "title": "Add Slide Start",
+        "title": "Code Slides: Add Slide",
         "icon": {
           "light": "images/light/add.svg",
           "dark": "images/dark/add.svg"
@@ -129,7 +129,7 @@
       },
       {
         "command": "code-slides.playProjectFromStart",
-        "title": "Play Project From Start",
+        "title": "Code Slides: Start Play Project",
         "icon": {
           "light": "images/light/play.svg",
           "dark": "images/dark/play.svg"
@@ -138,7 +138,7 @@
       },
       {
         "command": "code-slides.stopPlayProject",
-        "title": "Stop Play Project",
+        "title": "Code Slides: Stop Play Project",
         "icon": {
           "light": "images/light/stop-play.svg",
           "dark": "images/dark/stop-play.svg"
@@ -269,6 +269,42 @@
         }
       ]
     },
+    "keybindings": [
+      {
+        "command": "code-slides.addProject",
+        "key": "alt+ctrl+n",
+        "mac": "alt+cmd+n"
+      },
+      {
+        "command": "code-slides.addSlideStart",
+        "key": "alt+ctrl+a",
+        "mac": "alt+cmd+a"
+      },
+      {
+        "command": "code-slides.playProjectFromStart",
+        "key": "alt+ctrl+c",
+        "mac": "alt+cmd+c",
+        "when": "!code-slides.playStatusInfo"
+      },
+      {
+        "command": "code-slides.stopPlayProject",
+        "key": "alt+ctrl+c",
+        "mac": "alt+cmd+c",
+        "when": "code-slides.playStatusInfo"
+      },
+      {
+        "command": "code-slides.showPreSlide",
+        "key": "alt+ctrl+left",
+        "mac": "alt+cmd+left",
+        "when": "code-slides.playStatusInfo"
+      },
+      {
+        "command": "code-slides.showNextSlide",
+        "key": "alt+ctrl+right",
+        "mac": "alt+cmd+right",
+        "when": "code-slides.playStatusInfo"
+      }
+    ],
     "configuration": {
       "properties": {
         "code-slides.projects": {
