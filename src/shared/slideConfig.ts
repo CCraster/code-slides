@@ -1,4 +1,4 @@
-import { window, workspace } from 'vscode'
+import { workspace } from 'vscode'
 
 export class BaseConfig {
   static getConfig(cfgKey: string, defaultValue?: any): any {

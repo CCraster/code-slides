@@ -1,9 +1,9 @@
 {
   "name": "code-slides",
   "displayName": "Code Slides",
-  "description": "show you code like slide in vscode",
+  "description": "Show you code like slide in vscode",
   "version": "0.0.0",
-  "publisher": "craster",
+  "publisher": "Craster",
   "engines": {
     "vscode": "^1.57.0"
   },
@@ -11,6 +11,7 @@
     "Other"
   ],
   "icon": "images/logo.png",
+  "license": "SEE LICENSE IN LICENSE",
   "homepage": "https://github.com/CCraster/code-slides/blob/master/README.md",
   "repository": {
     "type": "git",

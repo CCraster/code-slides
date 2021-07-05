@@ -10,7 +10,7 @@ import {
 export class HelpAndFeedbackExplorer {
   constructor(context: ExtensionContext) {
     const items = new Array<Link | Command>()
-    const predefinedProvider = new StandardLinksProvider('craster.code-slides')
+    const predefinedProvider = new StandardLinksProvider('Craster.code-slides')
     items.push(predefinedProvider.getGetStartedLink())
     // items.push(new ProvideFeedbackLink('code-slides'))
     items.push(predefinedProvider.getReviewIssuesLink())

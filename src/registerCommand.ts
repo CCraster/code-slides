@@ -1,6 +1,7 @@
-import { ExtensionContext, commands, window, Uri } from 'vscode'
+import { ExtensionContext, commands, window } from 'vscode'
 import { SlideExplorer } from './explorers/slideExplorer'
 import { CodeSlidesConfig } from './shared/slideConfig'
+import { CodeSlidesProjectData } from './shared/dataHelper'
 import { GlobalState } from './shared/globalState'
 import { PlayingStatusInfo } from './shared/typed'
 import { ProjectTreeItem } from './shared/projectTreeItem'
@@ -8,19 +9,19 @@ import {
   highlightEditor,
   unHighlightActiveEditor,
 } from './shared/editorHighlight'
-import { openFile } from './shared/utils'
+import { openNewEditor } from './shared/utils'
 
 export function registerCommand(
   context: ExtensionContext,
   slideExplorer: SlideExplorer,
 ) {
-  CodeSlidesConfig.setProjectsConfig([]) // DEV
+  // CodeSlidesProjectData.setProjects([]) // DEV
 
   /**
    * command about project
    */
   commands.registerCommand('code-slides.setOptProject', async () => {
-    const projects = CodeSlidesConfig.getProjectsConfig()
+    const projects = CodeSlidesProjectData.getProjects()
     const quickPickItems = projects.map((item: ProjectTreeItem) => {
       return {
         ...item,
@@ -45,7 +46,7 @@ export function registerCommand(
 
   context.subscriptions.push(
     commands.registerCommand('code-slides.addProject', async () => {
-      const projects = CodeSlidesConfig.getProjectsConfig()
+      const projects = CodeSlidesProjectData.getProjects()
 
       const result = await window.showInputBox({
         value: '',
@@ -62,7 +63,7 @@ export function registerCommand(
 
       if (result !== undefined) {
         const project = new ProjectTreeItem(result, true)
-        await CodeSlidesConfig.setProjectsConfig([...projects, project])
+        CodeSlidesProjectData.setProjects([...projects, project])
         GlobalState.setCurrentOptProjectId(project.id)
         slideExplorer.treeView.reveal(project, {
           expand: true,
@@ -77,7 +78,7 @@ export function registerCommand(
     'code-slides.renameProject',
     async (node: ProjectTreeItem) => {
       const { title: optNodeTitle, id: optNodeId } = node
-      const projects = CodeSlidesConfig.getProjectsConfig()
+      const projects = CodeSlidesProjectData.getProjects()
       GlobalState.setCurrentOptProjectId(optNodeId)
 
       const result = await window.showInputBox({
@@ -97,11 +98,10 @@ export function registerCommand(
           (item: ProjectTreeItem) => item.id === node.id,
         )
         projects[nodeIndex].title = result
-        CodeSlidesConfig.setProjectsConfig(projects).then(() => {
-          window.showInformationMessage(
-            `[Project ${optNodeTitle}] has been renamed to ${result}`,
-          )
-        })
+        CodeSlidesProjectData.setProjects(projects)
+        window.showInformationMessage(
+          `[Project ${optNodeTitle}] has been renamed to ${result}`,
+        )
       }
     },
   )
@@ -111,7 +111,7 @@ export function registerCommand(
     async (node: ProjectTreeItem) => {
       const clearText = 'Clear Anyway'
       const { title: optNodeTitle, id: optNodeId } = node
-      const projects = CodeSlidesConfig.getProjectsConfig()
+      const projects = CodeSlidesProjectData.getProjects()
       GlobalState.setCurrentOptProjectId(optNodeId)
 
       const result = await window.showWarningMessage(
@@ -125,11 +125,10 @@ export function registerCommand(
           (item: ProjectTreeItem) => item.id === node.id,
         )
         projects[nodeIndex].children = []
-        CodeSlidesConfig.setProjectsConfig(projects).then(() => {
-          window.showInformationMessage(
-            `[Project ${optNodeTitle}] has been cleared`,
-          )
-        })
+        CodeSlidesProjectData.setProjects(projects)
+        window.showInformationMessage(
+          `[Project ${optNodeTitle}] has been cleared`,
+        )
       }
     },
   )
@@ -139,7 +138,7 @@ export function registerCommand(
     async (node: ProjectTreeItem) => {
       const deleteConfirmText = 'Delete Anyway'
       const { title: optNodeTitle, id: optNodeId } = node
-      const projects = CodeSlidesConfig.getProjectsConfig()
+      const projects = CodeSlidesProjectData.getProjects()
       GlobalState.setCurrentOptProjectId(optNodeId)
 
       const result = await window.showWarningMessage(
@@ -153,11 +152,10 @@ export function registerCommand(
           (item: ProjectTreeItem) => item.id === node.id,
         )
         projects.splice(nodeIndex, 1)
-        CodeSlidesConfig.setProjectsConfig(projects).then(() => {
-          window.showInformationMessage(
-            `[Project ${optNodeTitle}] has been deleted`,
-          )
-        })
+        CodeSlidesProjectData.setProjects(projects)
+        window.showInformationMessage(
+          `[Project ${optNodeTitle}] has been deleted`,
+        )
       }
     },
   )
@@ -169,7 +167,7 @@ export function registerCommand(
     commands.registerCommand(
       'code-slides.addSlideStart',
       async (node?: ProjectTreeItem) => {
-        const projects = CodeSlidesConfig.getProjectsConfig()
+        const projects = CodeSlidesProjectData.getProjects()
         const currentOptSlide = GlobalState.getCurrentOptSlide()
         let optProjectId = GlobalState.getCurrentOptProjectId()
 
@@ -234,8 +232,12 @@ export function registerCommand(
             false,
             projects[optProjectIndex].id,
           )
+          // give slide a init filePath
+          if (window.activeTextEditor) {
+            slide.slideFilePath = window.activeTextEditor.document.fileName
+          }
           projects[optProjectIndex].children.push(slide)
-          await CodeSlidesConfig.setProjectsConfig(projects)
+          CodeSlidesProjectData.setProjects(projects)
           GlobalState.setCurrentOptSlide(slide)
           slideExplorer.treeView.reveal(slide, {
             expand: true,
@@ -250,7 +252,7 @@ export function registerCommand(
   )
 
   commands.registerCommand('code-slides.addSlideEnd', async () => {
-    const projects = CodeSlidesConfig.getProjectsConfig()
+    const projects = CodeSlidesProjectData.getProjects()
     const currentOptSlide = GlobalState.getCurrentOptSlide()
     let optProjectId = GlobalState.getCurrentOptProjectId()
     const optProjectIndex = projects.findIndex(
@@ -259,6 +261,10 @@ export function registerCommand(
     const editSlideIndex = projects[optProjectIndex].children.findIndex(
       (item: ProjectTreeItem) => item.id === currentOptSlide?.id,
     )
+
+    if (!currentOptSlide) {
+      return
+    }
     if (editSlideIndex !== -1) {
       projects[optProjectIndex].children[editSlideIndex].highlightLines =
         currentOptSlide?.highlightLines
@@ -269,7 +275,7 @@ export function registerCommand(
       projects[optProjectIndex].children.push(currentOptSlide)
     }
 
-    await CodeSlidesConfig.setProjectsConfig(projects)
+    CodeSlidesProjectData.setProjects(projects)
     GlobalState.setCurrentOptSlide(null)
     unHighlightActiveEditor()
     currentOptSlide &&
@@ -308,7 +314,7 @@ export function registerCommand(
 
         GlobalState.setCurrentOptProjectId(node.parentId || null)
         GlobalState.setCurrentOptSlide(node)
-        await openFile(node.slideFilePath)
+        await openNewEditor(node.slideFilePath)
         highlightEditor(window.activeTextEditor, node)
 
         window.showInformationMessage(`[Slide ${node.title}] is in editing`)
@@ -319,7 +325,7 @@ export function registerCommand(
     'code-slides.renameSlide',
     async (node: ProjectTreeItem) => {
       const { title: optNodeTitle, id: optNodeId, parentId: optParentId } = node
-      const projects = CodeSlidesConfig.getProjectsConfig()
+      const projects = CodeSlidesProjectData.getProjects()
       const parentIndex = projects.findIndex(
         (item: ProjectTreeItem) => item.id === node.parentId,
       )
@@ -345,7 +351,7 @@ export function registerCommand(
           (item: ProjectTreeItem) => item.id === optNodeId,
         )
         projects[parentIndex].children[childIndex].title = result
-        await CodeSlidesConfig.setProjectsConfig(projects)
+        CodeSlidesProjectData.setProjects(projects)
         window.showInformationMessage(
           `[Slide ${optNodeTitle}] has been renamed to ${result}`,
         )
@@ -358,7 +364,7 @@ export function registerCommand(
     async (node: ProjectTreeItem) => {
       const { title: optNodeTitle, id: optNodeId, parentId: optParentId } = node
       const deleteConfirmText = 'Delete Anyway'
-      const projects = CodeSlidesConfig.getProjectsConfig()
+      const projects = CodeSlidesProjectData.getProjects()
       GlobalState.setCurrentOptProjectId(optParentId || null)
 
       const result = await window.showWarningMessage(
@@ -375,7 +381,7 @@ export function registerCommand(
           (item: ProjectTreeItem) => item.id === optNodeId,
         )
         projects[parentIndex].children.splice(childIndex, 1)
-        await CodeSlidesConfig.setProjectsConfig(projects)
+        CodeSlidesProjectData.setProjects(projects)
         window.showInformationMessage(
           `[Slide ${optNodeTitle}] has been deleted`,
         )
@@ -387,7 +393,7 @@ export function registerCommand(
     'code-slides.clickSlide',
     async (node: ProjectTreeItem) => {
       GlobalState.setCurrentOptProjectId(node.parentId || null)
-      await openFile(node.slideFilePath)
+      await openNewEditor(node.slideFilePath)
       highlightEditor(window.activeTextEditor, node)
     },
   )
@@ -399,8 +405,8 @@ export function registerCommand(
     commands.registerCommand(
       'code-slides.playProjectFromStart',
       async (node?: ProjectTreeItem) => {
-        let toPlayProjectNode: ProjectTreeItem | null = null
-        const projects = CodeSlidesConfig.getProjectsConfig()
+        let toPlayProjectNode: ProjectTreeItem | undefined
+        const projects = CodeSlidesProjectData.getProjects()
         const currentOptProjectId = GlobalState.getCurrentOptProjectId()
         if (node) {
           toPlayProjectNode = node
@@ -432,7 +438,7 @@ export function registerCommand(
               currentSlideIndex: 0,
             })
             GlobalState.setCurrentOptProjectId(toPlayProjectNode.id)
-            await openFile(toPlayProjectNode.children[0].slideFilePath)
+            await openNewEditor(toPlayProjectNode.children[0].slideFilePath)
             highlightEditor(
               window.activeTextEditor,
               toPlayProjectNode.children[0],
@@ -464,7 +470,7 @@ export function registerCommand(
   commands.registerCommand(
     'code-slides.playProjectFromHere',
     async (node: ProjectTreeItem) => {
-      const projects = CodeSlidesConfig.getProjectsConfig()
+      const projects = CodeSlidesProjectData.getProjects()
       const optNodeId = node.id
       const optNodeTitle = node.title
       const parentIndex = projects.findIndex(
@@ -479,7 +485,9 @@ export function registerCommand(
         currentSlideIndex: childIndex,
       })
       GlobalState.setCurrentOptProjectId(projects[parentIndex].id)
-      await openFile(projects[parentIndex].children[childIndex].slideFilePath)
+      await openNewEditor(
+        projects[parentIndex].children[childIndex].slideFilePath,
+      )
       highlightEditor(
         window.activeTextEditor,
         projects[parentIndex].children[childIndex],
@@ -501,7 +509,7 @@ export function registerCommand(
         inPlayingNode: playStatusInfo.inPlayingNode,
         currentSlideIndex: preSlideIndex,
       })
-      await openFile(
+      await openNewEditor(
         playStatusInfo.inPlayingNode.children[preSlideIndex].slideFilePath,
       )
       highlightEditor(
@@ -526,7 +534,7 @@ export function registerCommand(
         inPlayingNode: playStatusInfo.inPlayingNode,
         currentSlideIndex: nextSlideIndex,
       })
-      await openFile(
+      await openNewEditor(
         playStatusInfo.inPlayingNode.children[nextSlideIndex].slideFilePath,
       )
       highlightEditor(

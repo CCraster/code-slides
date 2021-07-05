@@ -3,12 +3,12 @@ import {
   EventEmitter,
   TreeDataProvider,
   TreeItem,
-  TreeItemCollapsibleState,
   workspace,
   ConfigurationChangeEvent,
 } from 'vscode'
 import * as path from 'path'
 import { CodeSlidesConfig } from '../shared/slideConfig'
+import { CodeSlidesProjectData } from '../shared/dataHelper'
 import { events } from '../shared/utils'
 import { GlobalState } from '../shared/globalState'
 import { ProjectTreeItem } from '../shared/projectTreeItem'
@@ -21,6 +21,7 @@ export class SlideProvider implements TreeDataProvider<any> {
     workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
       this.refresh()
     })
+    events.on('dataChange:projects', () => this.refresh())
     events.on('updatePlayingStatusInfo', () => this.refresh())
     events.on('updateCurrentOptProjectId', () => this.refresh())
     events.on('updateCurrentOptSlide', () => this.refresh())
@@ -29,7 +30,7 @@ export class SlideProvider implements TreeDataProvider<any> {
   getChildren(
     element: ProjectTreeItem,
   ): ProjectTreeItem[] | Thenable<ProjectTreeItem[]> {
-    const projects = CodeSlidesConfig.getProjectsConfig()
+    const projects = CodeSlidesProjectData.getProjects()
 
     if (!element) {
       return projects
@@ -39,7 +40,7 @@ export class SlideProvider implements TreeDataProvider<any> {
   }
 
   getParent(element: ProjectTreeItem) {
-    const projects = CodeSlidesConfig.getProjectsConfig()
+    const projects = CodeSlidesProjectData.getProjects()
 
     if (element.isProject) {
       return null

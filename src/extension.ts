@@ -1,16 +1,4 @@
-import {
-  window,
-  commands,
-  workspace,
-  Uri,
-  Range,
-  ExtensionContext,
-  TextEditorDecorationType,
-  TextEditor,
-  TreeView,
-  ConfigurationChangeEvent,
-} from 'vscode'
-import * as path from 'path'
+import { ExtensionContext } from 'vscode'
 
 import { SlideExplorer, HelpAndFeedbackExplorer } from './explorers'
 import { registerCommand } from './registerCommand'
@@ -19,17 +7,20 @@ import {
   wacthEditorSelectionChange,
   watchActiveTextEditorChange,
 } from './watchers'
+import { CodeSlidesProjectData } from './shared/dataHelper'
 
 let slideTreeView: SlideExplorer | null = null
 let projectPlayingStatusBar: ProjectPlayingStatusBar | null = null
 
 export function activate(context: ExtensionContext) {
   console.log('Congratulations, your extension "code-slides" is now active!')
-  let style: TextEditorDecorationType
+
+  CodeSlidesProjectData.setContext(context)
 
   slideTreeView = new SlideExplorer(context)
-  projectPlayingStatusBar = new ProjectPlayingStatusBar()
   new HelpAndFeedbackExplorer(context)
+
+  projectPlayingStatusBar = new ProjectPlayingStatusBar()
 
   registerCommand(context, slideTreeView)
 

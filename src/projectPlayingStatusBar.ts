@@ -2,6 +2,7 @@ import { StatusBarAlignment, StatusBarItem, window } from 'vscode'
 import { events } from './shared/utils'
 import { GlobalState } from './shared/globalState'
 import { CodeSlidesConfig } from './shared/slideConfig'
+import { CodeSlidesProjectData } from './shared/dataHelper'
 
 const normalStatusText = 'No Project in Working'
 const normalStatusColor = '#fff'
@@ -38,11 +39,6 @@ export class ProjectPlayingStatusBar {
   updatePlayingStatusBarItem() {
     const playStatusInfo = GlobalState.getInPlayingStatusInfo()
     const currentOptProjectId = GlobalState.getCurrentOptProjectId()
-    // console.log(
-    //   'xxx updatePlayingStatusBarItem',
-    //   playStatusInfo,
-    //   currentOptProjectId,
-    // )
 
     if (this.playingStatusBarItem) {
       if (playStatusInfo) {
@@ -53,11 +49,11 @@ export class ProjectPlayingStatusBar {
         }`
         this.playingStatusBarItem.color = playingColor
       } else if (currentOptProjectId) {
-        const projects = CodeSlidesConfig.getProjectsConfig()
+        const projects = CodeSlidesProjectData.getProjects()
         const optProject = projects.find(
           (item: any) => item.id === currentOptProjectId,
         )
-        this.playingStatusBarItem.text = `👀: ${optProject.title}`
+        this.playingStatusBarItem.text = `👀: ${optProject?.title}`
         this.playingStatusBarItem.color = normalStatusColor
       } else {
         this.playingStatusBarItem.text = normalStatusText
