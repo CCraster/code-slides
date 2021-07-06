@@ -12,8 +12,6 @@ import { CodeSlidesProjectData } from './shared/dataHelper'
 import { CODE_SLIDES_DEFAULT_CONFIG } from './shared/constants'
 
 const normalStatusText = 'No Project in Working'
-const normalStatusColor = '#fff'
-const playingColor = '#0f0'
 
 export class ProjectPlayingStatusBar {
   isEnable: boolean = CODE_SLIDES_DEFAULT_CONFIG.hideStatusBar

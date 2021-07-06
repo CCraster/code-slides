@@ -8,8 +8,12 @@ export const HIGHLIGHT_MODE_MAP = {
 
 export const CODE_SLIDES_DEFAULT_CONFIG = {
   highlightMode: HIGHLIGHT_MODE_MAP.weaken,
-  lineWeakenColor: 'rgba(255, 255, 255, 0.2)',
-  lineStrengthenColor: '#f00',
+  lineWeakenColor: {
+    opacity: '0.2',
+  },
+  lineStrengthenColor: {
+    backgroundColor: 'rgba(255, 0, 0, 0.5)',
+  },
   hideStatusBar: false,
   statusBarNormalColor: '#fff',
   statusBarPlayingColor: '#0f0',

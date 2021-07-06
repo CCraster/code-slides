@@ -9,7 +9,6 @@ import { GlobalState } from '../shared/globalState'
 
 export function wacthEditorSelectionChange(context: ExtensionContext) {
   window.onDidChangeTextEditorSelection((e: TextEditorSelectionChangeEvent) => {
-    const playStatusInfo = GlobalState.getInPlayingStatusInfo()
     const currentOptSlide = GlobalState.getCurrentOptSlide()
     if (currentOptSlide) {
       handleSlideRelativeSelectionChange(Array.from(e.selections))
@@ -39,8 +38,3 @@ function handleSlideRelativeSelectionChange(
 
   highlightEditor(window.activeTextEditor, currentOptSlide)
 }
-
-/**
- * project is playing
- */
-function handleSlideRelativeSelectionChnage(): void {}

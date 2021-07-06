@@ -33,24 +33,24 @@ export class CodeSlidesConfig extends BaseConfig {
     return this.setConfig('code-slides.highlightMode', value)
   }
 
-  static getLineWeakenColor(): string {
+  static getLineWeakenRenderOptions(): object {
     return this.getConfig(
-      'code-slides.lineWeakenColor',
+      'code-slides.lineWeakenRenderOptions',
       CODE_SLIDES_DEFAULT_CONFIG.lineWeakenColor,
     )
   }
-  static setLineWeakenColor(value: string): any {
-    return this.setConfig('code-slides.lineWeakenColor', value)
+  static setLineWeakenRenderOptions(value: object): any {
+    return this.setConfig('code-slides.lineWeakenRenderOptions', value)
   }
 
-  static getLineStrengthenColor(): string {
+  static getLineStrengthenRenderOptions(): object {
     return this.getConfig(
-      'code-slides.lineStrengthenColor',
+      'code-slides.lineStrengthenRenderOptions',
       CODE_SLIDES_DEFAULT_CONFIG.lineStrengthenColor,
     )
   }
-  static setLineStrengthenColor(value: string): any {
-    return this.setConfig('code-slides.lineStrengthenColor', value)
+  static setLineStrengthenRenderOptions(value: object): any {
+    return this.setConfig('code-slides.lineStrengthenRenderOptions', value)
   }
 
   static getHideStatusBar(): boolean {

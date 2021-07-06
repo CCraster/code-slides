@@ -189,22 +189,22 @@
         {
           "command": "code-slides.addSlideStart",
           "when": "!code-slides.currentOptSlide",
-          "group": "navigation@1"
+          "group": "navigation@-100"
         },
         {
           "command": "code-slides.addSlideEnd",
           "when": "code-slides.currentOptSlide",
-          "group": "navigation@2"
+          "group": "navigation@-99"
         },
         {
           "command": "code-slides.showPreSlide",
           "when": "code-slides.playStatusInfo",
-          "group": "navigation@3"
+          "group": "navigation@-98"
         },
         {
           "command": "code-slides.showNextSlide",
           "when": "code-slides.playStatusInfo",
-          "group": "navigation@4"
+          "group": "navigation@-97"
         }
       ],
       "view/title": [
@@ -339,15 +339,19 @@
             "weaken lines you don not want to highlight & strengthen lines you want to highlight"
           ]
         },
-        "code-slides.lineWeakenColor": {
-          "type": "string",
-          "default": "rgba(255, 255, 255, 0.2)",
-          "description": "color use to weaken lines that you don not want to highlight"
+        "code-slides.lineWeakenRenderOptions": {
+          "type": "object",
+          "default": {
+            "opacity": "0.2"
+          },
+          "markdownDescription": "[DecorationRenderOptions](https://code.visualstudio.com/api/references/vscode-api#DecorationRenderOptions) use to weaken lines that you don not want to highlight"
         },
-        "code-slides.lineStrengthenColor": {
-          "type": "string",
-          "default": "#f00",
-          "description": "color use to strengthen lines that you want to highlight"
+        "code-slides.lineStrengthenRenderOptions": {
+          "type": "object",
+          "default": {
+            "backgroundColor": "rgba(255, 0, 0, 0.5)"
+          },
+          "description": "[DecorationRenderOptions](https://code.visualstudio.com/api/references/vscode-api#DecorationRenderOptions) use to strengthen lines that you want to highlight"
         },
         "code-slides.hideStatusBar": {
           "type": "boolean",
