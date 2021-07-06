@@ -18,13 +18,6 @@ export class CodeSlidesProjectData {
       [],
     )
     this.context.globalState.update(PROJECT_TAG, projectsData)
-    // workspace
-    //   .openTextDocument(
-    //     path.join(this.context.globalStorageUri.fsPath, `${PROJECT_TAG}.json`),
-    //   )
-    //   .then((doc) => {
-    //     window.showTextDocument(doc)
-    //   })
   }
 
   static getProjects(): Array<ProjectTreeItem> {

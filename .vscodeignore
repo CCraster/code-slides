@@ -8,5 +8,6 @@ src/**
 vsc-extension-quickstart.md
 **/tsconfig.json
 **/.eslintrc.json
+**/.prettierrc.*
 **/*.map
 **/*.ts

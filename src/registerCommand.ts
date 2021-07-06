@@ -1,6 +1,7 @@
-import { ExtensionContext, commands, window } from 'vscode'
+import { ExtensionContext, commands, window, workspace } from 'vscode'
+import * as path from 'path'
+
 import { SlideExplorer } from './explorers/slideExplorer'
-import { CodeSlidesConfig } from './shared/codeSlidesConfig'
 import { CodeSlidesProjectData } from './shared/dataHelper'
 import { GlobalState } from './shared/globalState'
 import { PlayingStatusInfo } from './shared/typed'
@@ -10,16 +11,25 @@ import {
   unHighlightActiveEditor,
 } from './shared/editorHighlight'
 import { openNewEditor } from './shared/utils'
+import { PROJECT_TAG } from './shared/constants'
 
 export function registerCommand(
   context: ExtensionContext,
   slideExplorer: SlideExplorer,
 ) {
-  // CodeSlidesProjectData.setProjects([]) // DEV
-
   /**
    * command about project
    */
+  commands.registerCommand('code-slides.openProjectDataFile', async () => {
+    workspace
+      .openTextDocument(
+        path.join(context.globalStorageUri.fsPath, `${PROJECT_TAG}.json`),
+      )
+      .then((doc) => {
+        window.showTextDocument(doc)
+      })
+  })
+
   commands.registerCommand('code-slides.deleteAllProject', async () => {
     const projects = CodeSlidesProjectData.getProjects()
     const deleteAllConfirmText = 'Delete Anyway'

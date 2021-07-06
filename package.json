@@ -18,6 +18,10 @@
     "show",
     "display"
   ],
+  "galleryBanner": {
+    "color": "#1E1E1E",
+    "theme": "dark"
+  },
   "icon": "images/logo.png",
   "license": "SEE LICENSE IN LICENSE",
   "homepage": "https://github.com/CCraster/code-slides/blob/master/README.md",
@@ -29,8 +33,7 @@
     "url": "https://github.com/CCraster/code-slides/issues"
   },
   "activationEvents": [
-    "*",
-    "onCommand:code-slides.addProject"
+    "*"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -63,6 +66,10 @@
       }
     ],
     "commands": [
+      {
+        "command": "code-slides.openProjectDataFile",
+        "title": "View Project Data"
+      },
       {
         "command": "code-slides.deleteAllProject",
         "title": "Delete All Project"
@@ -214,7 +221,12 @@
           "group": "navigation@1"
         },
         {
-          "command": "code-slides.deleteAllProject"
+          "command": "code-slides.openProjectDataFile",
+          "group": "group1@1"
+        },
+        {
+          "command": "code-slides.deleteAllProject",
+          "group": "group1@2"
         }
       ],
       "view/item/context": [
@@ -333,6 +345,7 @@
             "Strengthen Highliht Line",
             "Both"
           ],
+          "description": "code-slides highlight mode",
           "enumDescriptions": [
             "weaken lines that you don not want to highlight with specific color",
             "strengthen lines that you want to highlight with specific color",
@@ -351,7 +364,7 @@
           "default": {
             "backgroundColor": "rgba(255, 0, 0, 0.5)"
           },
-          "description": "[DecorationRenderOptions](https://code.visualstudio.com/api/references/vscode-api#DecorationRenderOptions) use to strengthen lines that you want to highlight"
+          "markdownDescription": "[DecorationRenderOptions](https://code.visualstudio.com/api/references/vscode-api#DecorationRenderOptions) use to strengthen lines that you want to highlight"
         },
         "code-slides.hideStatusBar": {
           "type": "boolean",

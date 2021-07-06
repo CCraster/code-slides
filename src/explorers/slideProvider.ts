@@ -5,6 +5,7 @@ import {
   TreeItem,
   workspace,
   ConfigurationChangeEvent,
+  TreeItemCollapsibleState,
 } from 'vscode'
 import * as path from 'path'
 import { CodeSlidesProjectData } from '../shared/dataHelper'
@@ -12,7 +13,7 @@ import { events } from '../shared/utils'
 import { GlobalState } from '../shared/globalState'
 import { ProjectTreeItem } from '../shared/projectTreeItem'
 
-export class SlideProvider implements TreeDataProvider<any> {
+export class SlideProvider implements TreeDataProvider<ProjectTreeItem> {
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>()
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event
 
@@ -86,6 +87,7 @@ export class SlideProvider implements TreeDataProvider<any> {
             : undefined,
         contextValue:
           element.id === currentOptSlide?.id ? 'slide-editing' : 'slide',
+        collapsibleState: TreeItemCollapsibleState.None,
         command: {
           title: 'Show Slide Content',
           command: 'code-slides.clickSlide',
@@ -94,9 +96,10 @@ export class SlideProvider implements TreeDataProvider<any> {
         tooltip: element.slideFilePath,
       }
     } else {
+      const childrenNum = element.children?.length
       return {
         ...element,
-        label: element.title,
+        label: `${element.title}${childrenNum > 0 ? ` (${childrenNum})` : ''}`,
         iconPath:
           element.id === currentOptProjectId
             ? {
@@ -118,10 +121,10 @@ export class SlideProvider implements TreeDataProvider<any> {
                 ),
               }
             : undefined,
-        // collapsibleState:
-        //   element.id === currentOptProjectId
-        //     ? TreeItemCollapsibleState.Expanded
-        //     : TreeItemCollapsibleState.Collapsed,
+        collapsibleState:
+          element.id === currentOptProjectId
+            ? TreeItemCollapsibleState.Expanded
+            : TreeItemCollapsibleState.Collapsed,
         command: undefined,
         contextValue:
           element.id === playingStatusInfo?.inPlayingNode?.id
@@ -129,6 +132,7 @@ export class SlideProvider implements TreeDataProvider<any> {
             : element.id === currentOptSlide?.parentId
             ? 'project-adding'
             : 'project',
+        tooltip: element.title,
       }
     }
   }
