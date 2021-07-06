@@ -339,16 +339,16 @@
       "properties": {
         "code-slides.highlightMode": {
           "type": "string",
-          "default": "Weaken Unhighliht Line",
+          "default": "Weaken Unhighlight Line",
           "enum": [
-            "Weaken Unhighliht Line",
-            "Strengthen Highliht Line",
+            "Weaken Unhighlight Line",
+            "Strengthen Highlight Line",
             "Both"
           ],
           "description": "code-slides highlight mode",
           "enumDescriptions": [
-            "weaken lines that you don not want to highlight with specific color",
-            "strengthen lines that you want to highlight with specific color",
+            "weaken lines that you do not want to highlight with config 'lineWeakenRenderOptions'",
+            "strengthen lines that you want to highlight with config 'lineStrengthenRenderOptions'",
             "weaken lines you don not want to highlight & strengthen lines you want to highlight"
           ]
         },
@@ -369,7 +369,7 @@
         "code-slides.hideStatusBar": {
           "type": "boolean",
           "default": false,
-          "description": "hide code-clides staus bar(not recommend)"
+          "description": "hide code-clides status bar(not recommended)"
         },
         "code-slides.statusBarNormalColor": {
           "type": "string",

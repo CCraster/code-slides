@@ -1,8 +1,8 @@
 export const PROJECT_TAG = 'projects'
 
 export const HIGHLIGHT_MODE_MAP = {
-  weaken: 'Weaken Unhighliht Line',
-  strengthen: 'Strengthen Highliht Line',
+  weaken: 'Weaken Unhighlight Line',
+  strengthen: 'Strengthen Highlight Line',
   both: 'Both',
 }
 

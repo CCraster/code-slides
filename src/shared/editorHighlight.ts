@@ -58,6 +58,8 @@ export async function highlightEditor(
         weakenRanges.push(new Range(i, 0, i + 1, 0))
       }
     }
+    // no highlight lines, let weaken range also empty
+    !strengthenRanges.length && (weakenRanges = [])
 
     // scroll highlight code to editor view center
     const topPaddingLineNum = 5
