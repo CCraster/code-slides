@@ -9,6 +9,7 @@ import {
 import { ProjectTreeItem } from './projectTreeItem'
 import { CodeSlidesConfig } from './codeSlidesConfig'
 import { HIGHLIGHT_MODE_MAP } from '../shared/constants'
+import { HighlightOption } from './typed'
 
 let lineWeakenStyle: TextEditorDecorationType =
   window.createTextEditorDecorationType({})
@@ -18,6 +19,9 @@ let lineStrengthenStyle: TextEditorDecorationType =
 export async function highlightEditor(
   editor: TextEditor | undefined = window.activeTextEditor,
   slideItem: ProjectTreeItem | null,
+  options: HighlightOption = {
+    notRevealEditorRange: false,
+  },
 ): Promise<void> {
   if (
     editor &&
@@ -56,31 +60,27 @@ export async function highlightEditor(
     }
 
     // scroll highlight code to editor view center
-    editor.revealRange(
-      new Range(minLineNum, 0, minLineNum + 1, 0),
-      TextEditorRevealType.InCenterIfOutsideViewport,
-    )
-    // try to solve conflict with other extensions
-    setTimeout(() => {
-      if (highlightMode === HIGHLIGHT_MODE_MAP.weaken) {
-        editor.setDecorations(lineWeakenStyle, weakenRanges)
-      } else if (highlightMode === HIGHLIGHT_MODE_MAP.strengthen) {
-        editor.setDecorations(lineStrengthenStyle, strengthenRanges)
-      } else {
-        editor.setDecorations(lineWeakenStyle, weakenRanges)
-        editor.setDecorations(lineStrengthenStyle, strengthenRanges)
-      }
-    }, 100)
+    const topPaddingLineNum = 5
+    !options.notRevealEditorRange &&
+      editor.revealRange(
+        new Range(
+          minLineNum > topPaddingLineNum ? minLineNum - topPaddingLineNum : 0,
+          0,
+          minLineNum + 1,
+          0,
+        ),
+        TextEditorRevealType.AtTop,
+      )
 
     // highlight lines
-    // if (highlightMode === HIGHLIGHT_MODE_MAP.weaken) {
-    //   editor.setDecorations(lineWeakenStyle, weakenRanges)
-    // } else if (highlightMode === HIGHLIGHT_MODE_MAP.strengthen) {
-    //   editor.setDecorations(lineStrengthenStyle, strengthenRanges)
-    // } else {
-    //   editor.setDecorations(lineWeakenStyle, weakenRanges)
-    //   editor.setDecorations(lineStrengthenStyle, strengthenRanges)
-    // }
+    if (highlightMode === HIGHLIGHT_MODE_MAP.weaken) {
+      editor.setDecorations(lineWeakenStyle, weakenRanges)
+    } else if (highlightMode === HIGHLIGHT_MODE_MAP.strengthen) {
+      editor.setDecorations(lineStrengthenStyle, strengthenRanges)
+    } else {
+      editor.setDecorations(lineWeakenStyle, weakenRanges)
+      editor.setDecorations(lineStrengthenStyle, strengthenRanges)
+    }
   }
 }
 

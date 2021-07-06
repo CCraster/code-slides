@@ -45,9 +45,11 @@ export class ProjectPlayingStatusBar {
       }
       events.on('updatePlayingStatusInfo', statusBarUpdateHandler)
       events.on('updateCurrentOptProjectId', statusBarUpdateHandler)
+      events.on('dataChange:projects', statusBarUpdateHandler)
       this.unsubscribe = () => {
         events.off('updatePlayingStatusInfo', statusBarUpdateHandler)
         events.off('updateCurrentOptProjectId', statusBarUpdateHandler)
+        events.off('dataChange:projects', statusBarUpdateHandler)
       }
     }
   }

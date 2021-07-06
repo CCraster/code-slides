@@ -4,7 +4,7 @@ import * as path from 'path'
 import { SlideExplorer } from './explorers/slideExplorer'
 import { CodeSlidesProjectData } from './shared/dataHelper'
 import { GlobalState } from './shared/globalState'
-import { PlayingStatusInfo } from './shared/typed'
+import { PlayingStatusInfo, FocusNodeInfo } from './shared/typed'
 import { ProjectTreeItem } from './shared/projectTreeItem'
 import {
   highlightEditor,
@@ -12,6 +12,22 @@ import {
 } from './shared/editorHighlight'
 import { openNewEditor } from './shared/utils'
 import { PROJECT_TAG } from './shared/constants'
+
+// slide click will change it
+let focusNodeinfo: FocusNodeInfo | null = null
+
+async function highlightSlide(
+  slideExplorer: SlideExplorer,
+  slide: ProjectTreeItem,
+) {
+  focusNodeinfo = { id: slide.id, isHighlight: true }
+  slideExplorer.treeView.reveal(slide, {
+    expand: true,
+    focus: true,
+  })
+  await openNewEditor(slide.slideFilePath)
+  highlightEditor(window.activeTextEditor, slide)
+}
 
 export function registerCommand(
   context: ExtensionContext,
@@ -314,7 +330,7 @@ export function registerCommand(
         focus: true,
       })
     window.showInformationMessage(
-      `Slide ${currentOptSlide?.title} has been added to [Project ${projects[optProjectIndex].title}]`,
+      `[Slide ${currentOptSlide?.title}] has been added to [Project ${projects[optProjectIndex].title}]`,
     )
   })
 
@@ -431,13 +447,33 @@ export function registerCommand(
   commands.registerCommand(
     'code-slides.clickSlide',
     async (node: ProjectTreeItem) => {
+      const playStatusInfo = GlobalState.getInPlayingStatusInfo()
+      const currentOptSlide = GlobalState.getCurrentOptSlide()
+      const activeEditor = window.activeTextEditor
+
       slideExplorer.treeView.reveal(node, {
         expand: true,
         focus: true,
       })
       GlobalState.setCurrentOptProjectId(node.parentId || null)
-      await openNewEditor(node.slideFilePath)
-      highlightEditor(window.activeTextEditor, node)
+
+      // not work while slide editing
+      if (currentOptSlide) {
+        return
+      }
+
+      if (
+        focusNodeinfo?.id === node.id &&
+        focusNodeinfo?.isHighlight &&
+        activeEditor?.document.fileName === node.slideFilePath
+      ) {
+        focusNodeinfo = { id: node.id, isHighlight: false }
+        unHighlightActiveEditor()
+      } else {
+        focusNodeinfo = { id: node.id, isHighlight: true }
+        await openNewEditor(node.slideFilePath)
+        highlightEditor(window.activeTextEditor, node)
+      }
     },
   )
 
@@ -481,11 +517,7 @@ export function registerCommand(
               currentSlideIndex: 0,
             })
             GlobalState.setCurrentOptProjectId(toPlayProjectNode.id)
-            await openNewEditor(toPlayProjectNode.children[0].slideFilePath)
-            highlightEditor(
-              window.activeTextEditor,
-              toPlayProjectNode.children[0],
-            )
+            highlightSlide(slideExplorer, toPlayProjectNode.children[0])
             window.showInformationMessage(
               `Project ${optNodeName} is now playing`,
             )
@@ -503,6 +535,7 @@ export function registerCommand(
     commands.registerCommand(
       'code-slides.stopPlayProject',
       async (node: ProjectTreeItem) => {
+        focusNodeinfo = null
         GlobalState.setInPlayingStatusInfo(null)
         unHighlightActiveEditor()
         window.showInformationMessage(`code-slides has stoped play mode`)
@@ -528,20 +561,7 @@ export function registerCommand(
         currentSlideIndex: childIndex,
       })
       GlobalState.setCurrentOptProjectId(projects[parentIndex].id)
-      await openNewEditor(
-        projects[parentIndex].children[childIndex].slideFilePath,
-      )
-      highlightEditor(
-        window.activeTextEditor,
-        projects[parentIndex].children[childIndex],
-      )
-      slideExplorer.treeView.reveal(
-        projects[parentIndex].children[childIndex],
-        {
-          expand: true,
-          focus: true,
-        },
-      )
+      highlightSlide(slideExplorer, projects[parentIndex].children[childIndex])
       window.showInformationMessage(`Now is changed to slide ${optNodeTitle}`)
     },
   )
@@ -559,11 +579,8 @@ export function registerCommand(
         inPlayingNode: playStatusInfo.inPlayingNode,
         currentSlideIndex: preSlideIndex,
       })
-      await openNewEditor(
-        playStatusInfo.inPlayingNode.children[preSlideIndex].slideFilePath,
-      )
-      highlightEditor(
-        window.activeTextEditor,
+      highlightSlide(
+        slideExplorer,
         playStatusInfo.inPlayingNode.children[preSlideIndex],
       )
     }
@@ -584,11 +601,8 @@ export function registerCommand(
         inPlayingNode: playStatusInfo.inPlayingNode,
         currentSlideIndex: nextSlideIndex,
       })
-      await openNewEditor(
-        playStatusInfo.inPlayingNode.children[nextSlideIndex].slideFilePath,
-      )
-      highlightEditor(
-        window.activeTextEditor,
+      highlightSlide(
+        slideExplorer,
         playStatusInfo.inPlayingNode.children[nextSlideIndex],
       )
     }

@@ -36,5 +36,7 @@ function handleSlideRelativeSelectionChange(
   })
   currentOptSlide && (currentOptSlide.highlightLines = slideHighlightLines)
 
-  highlightEditor(window.activeTextEditor, currentOptSlide)
+  highlightEditor(window.activeTextEditor, currentOptSlide, {
+    notRevealEditorRange: true,
+  })
 }
