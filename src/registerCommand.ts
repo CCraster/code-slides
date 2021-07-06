@@ -185,7 +185,7 @@ export function registerCommand(
       const deleteConfirmText = 'Delete Anyway'
       const { title: optNodeTitle, id: optNodeId } = node
       const projects = CodeSlidesProjectData.getProjects()
-      GlobalState.setCurrentOptProjectId(optNodeId)
+      const currentOptProjectId = GlobalState.getCurrentOptProjectId()
 
       const result = await window.showWarningMessage(
         `Are you really want to delete [Project ${optNodeTitle}]?`,
@@ -199,6 +199,9 @@ export function registerCommand(
         )
         projects.splice(nodeIndex, 1)
         CodeSlidesProjectData.setProjects(projects)
+        if (optNodeId === currentOptProjectId) {
+          GlobalState.setCurrentOptProjectId(null)
+        }
         window.showInformationMessage(
           `[Project ${optNodeTitle}] has been deleted`,
         )

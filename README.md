@@ -1,17 +1,29 @@
-# CodeSlides
+# Code Slides
 
-Show you code like slide in vscode
+<div style="display:flex;justify-content:center;margin:10px 0">
+  <img width="120px"src="./images/logo.png" alt="logo" />
+</div>
+<p align="center">
+<a href="https://github.com/CCraster/code-slides"><img src="https://img.shields.io/github/languages/top/CCraster/code-slides" alt="License"></a>
+<a href="https://github.com/CCraster/code-slides/blob/master/LICENSE"><img src="https://img.shields.io/github/license/CCraster/code-slides" alt="License"></a>
+
+</p>
+
+"Talk is cheap, show me your code!!!". Now, it's time to show them you code like slide with `Code Slides`.
 
 ## Features
 
-- Capture code snippets and Highlight them
-- Organize multiple code snippets as Slides and store these slides as Project
-- Present multiple slides under the chosen project
-- Can choose code snippets from different codebase and store them at the same project
-- Provide the Side Bar View to visualize, explore, and manage all slides and projects
-- Freely switch among different slides
+- 🔥 Capture code snippets and Highlight them
+- 🎉 Organize multiple code snippets as Slides and store these slides as Project
+- 🎆 Present multiple slides under the chosen project
+- 🎨 Choose code snippets from different codebase and store them at the same project
+- ⚡ Provide the Side Bar View to visualize, explore, and manage all slides and projects
+- 🔧 A Status Bar which identifies the project current working on or project playing status
+- 📺 Control presentation with [Keyboard Shortcuts](#keyboard-shortcuts) and freely switch among different slides
 
 ## Getting Started with Code Slides
+
+![start-with-code-slides](./images/readme/start-with-code-slides.gif)
 
 1. Open `Code Slides` at vscode Side Bar.
 2. Create project.
@@ -21,24 +33,24 @@ Show you code like slide in vscode
 
 ## Configuration
 
-CodeSlides is configurable. Here's a demo and list of settings you can change:
+Code Slides is configurable. Here's a list of settings you can change:
 
-```
+```json
 {
-  "highlightMode": "Weaken Unhighliht Line",
-  "lineWeakenColor": {
-    "opacity": "0.2",
+  "code-slides.highlightMode": "Weaken Unhighliht Line",
+  "code-slides.lineWeakenColor": {
+    "opacity": "0.2"
   },
-  "lineStrengthenColor": {
-    "backgroundColor": "rgba(255, 0, 0, 0.5)",
+  "code-slides.lineStrengthenColor": {
+    "backgroundColor": "rgba(255, 0, 0, 0.5)"
   },
-  "hideStatusBar": "false",
-  "statusBarNormalColor": "#fff",
-  "statusBarPlayingColor": "#0f0",
+  "code-slides.hideStatusBar": "false",
+  "code-slides.statusBarNormalColor": "#fff",
+  "code-slides.statusBarPlayingColor": "#0f0"
 }
 ```
 
-**`code-slides.highlightMode`:** The highlight mode in presentation. Can choose from 3 values: "Weaken Unhighliht Line", "Strengthen Highliht Line", "Both", and can used with "lineWeakenRenderOptions" and "lineStrengthenRenderOptions" together.
+**`code-slides.highlightMode`:** The highlight mode in presentation. Can choose from 3 values: "Weaken Unhighlight Line", "Strengthen Highlight Line", "Both", and can used with "lineWeakenRenderOptions" and "lineStrengthenRenderOptions" together.
 
 **`code-slides.lineWeakenRenderOptions`:** The [VSCode decoration render options](https://code.visualstudio.com/api/references/vscode-api#DecorationRenderOptions) for weaken.
 
@@ -51,14 +63,12 @@ CodeSlides is configurable. Here's a demo and list of settings you can change:
 **`code-slides.statusBarPlayingColor`:** The background color of the status bar when playing slides. Can be any valid CSS color.
 
 ## Keyboard Shortcuts
-|  Name   | Description  | Windows Platform | MacOS Platform |
-|  ----  | ----  | ----  | ----  |
-| code-slides.addProject | create a project | alt+ctrl+n | alt+cmd+n |
-| code-slides.addSlideStart | add a slide under a project | alt+ctrl+a | alt+cmd+a |
-| code-slides.playProjectFromStart | start presentation from a project | alt+ctrl+c | alt+cmd+c |
-| code-slides.stopPlayProject | stop presentation from a project | alt+ctrl+c | alt+cmd+c |
-| code-slides.showPreSlide | switch to the previous slide | alt+ctrl+left | alt+cmd+left |
-| code-slides.showNextSlide | switch to the next slide | alt+ctrl+right | alt+cmd+right |
 
-## Acknowledgements
-
+| Name                             | Description                       | Windows Platform | MacOS Platform   |
+| -------------------------------- | --------------------------------- | ---------------- | ---------------- |
+| code-slides.addProject           | create a project                  | alt+ctrl+n       | option+cmd+n     |
+| code-slides.addSlideStart        | add a slide under a project       | alt+ctrl+a       | option+cmd+a     |
+| code-slides.playProjectFromStart | start presentation from a project | alt+ctrl+c       | option+cmd+c     |
+| code-slides.stopPlayProject      | stop presentation from a project  | alt+ctrl+c       | option+cmd+c     |
+| code-slides.showPreSlide         | switch to the previous slide      | alt+ctrl+left    | option+cmd+left  |
+| code-slides.showNextSlide        | switch to the next slide          | alt+ctrl+right   | option+cmd+right |

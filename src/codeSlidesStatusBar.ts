@@ -71,7 +71,9 @@ export class ProjectPlayingStatusBar {
         const optProject = projects.find(
           (item: any) => item.id === currentOptProjectId,
         )
-        this.playingStatusBarItem.text = `👀: ${optProject?.title}`
+        this.playingStatusBarItem.text = optProject
+          ? `👀: ${optProject?.title}`
+          : normalStatusText
         this.playingStatusBarItem.color = this.statusBarNormalColor
       } else {
         this.playingStatusBarItem.text = normalStatusText
