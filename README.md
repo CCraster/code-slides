@@ -1,8 +1,8 @@
 # Code Slides
 
-<div style="display:flex;justify-content:center;margin:10px 0">
+<p align="center">
   <img width="120px"src="./images/logo.png" alt="logo" />
-</div>
+</p>
 <p align="center">
 <a href="https://github.com/CCraster/code-slides"><img src="https://img.shields.io/github/languages/top/CCraster/code-slides" alt="License"></a>
 <a href="https://github.com/CCraster/code-slides/blob/master/LICENSE"><img src="https://img.shields.io/github/license/CCraster/code-slides" alt="License"></a>
