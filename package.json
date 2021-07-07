@@ -2,7 +2,7 @@
   "name": "code-slides",
   "displayName": "Code Slides",
   "description": "Show you code like slide in vscode",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "Craster",
   "engines": {
     "vscode": "^1.45.0"
