@@ -9,7 +9,7 @@
 
 </p>
 
-"Talk is cheap, show me your code!!!". Now, it's time to show them you code like slide with `Code Slides`.
+"Talk is cheap, show me your code!!!". Now, it's time to show them your code like slides with `Code Slides`.
 
 ## Features
 
