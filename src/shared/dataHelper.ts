@@ -10,14 +10,20 @@ import { PROJECT_TAG } from './constants'
 export class CodeSlidesProjectData {
   static context: ExtensionContext
 
-  static setContext(context: ExtensionContext): void {
+  static dataReload(context: ExtensionContext): void {
     this.context = context
     const projectsData = readFileIfNotExistCreate(
       context.globalStorageUri.fsPath,
       `${PROJECT_TAG}.json`,
       [],
     )
-    this.context.globalState.update(PROJECT_TAG, projectsData)
+    const previousProjects = this.context.globalState.get(PROJECT_TAG)
+    if (
+      !previousProjects ||
+      JSON.stringify(previousProjects) !== JSON.stringify(projectsData)
+    ) {
+      this.setProjects(projectsData)
+    }
   }
 
   static getProjects(): Array<ProjectTreeItem> {

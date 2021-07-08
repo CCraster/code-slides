@@ -1,4 +1,4 @@
-import { commands, Uri } from 'vscode'
+import { commands, Uri, window } from 'vscode'
 import * as fs from 'fs'
 import * as path from 'path'
 import { EventEmitter } from 'events'
@@ -34,7 +34,13 @@ export const readFileIfNotExistCreate = (
     fs.writeFileSync(filePath, JSON.stringify(defaultValue))
     fileContent = defaultValue
   } else {
-    fileContent = JSON.parse(fs.readFileSync(filePath).toString())
+    try {
+      fileContent = JSON.parse(fs.readFileSync(filePath).toString())
+    } catch (e) {
+      window.showErrorMessage(
+        'It seems something wrong with code-slides perject data!',
+      )
+    }
   }
 
   return fileContent

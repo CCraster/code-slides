@@ -6,6 +6,7 @@ import { ProjectPlayingStatusBar } from './codeSlidesStatusBar'
 import {
   wacthEditorSelectionChange,
   watchActiveTextEditorChange,
+  watchDataFileChange,
 } from './watchers'
 import { CodeSlidesProjectData } from './shared/dataHelper'
 
@@ -15,7 +16,7 @@ let projectPlayingStatusBar: ProjectPlayingStatusBar | null = null
 export function activate(context: ExtensionContext) {
   console.log('Congratulations, your extension "code-slides" is now active!')
 
-  CodeSlidesProjectData.setContext(context)
+  CodeSlidesProjectData.dataReload(context)
 
   slideTreeView = new SlideExplorer(context)
   new HelpAndFeedbackExplorer(context)
@@ -26,6 +27,7 @@ export function activate(context: ExtensionContext) {
 
   wacthEditorSelectionChange(context)
   watchActiveTextEditorChange(context)
+  watchDataFileChange(context)
 }
 
 export function deactivate() {}
