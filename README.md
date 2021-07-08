@@ -9,7 +9,7 @@
 
 </p>
 
-"Talk is cheap, show me your code!!!". Now, it's time to show them your code as slides with `Code Slides`.
+"Talk is cheap, show me your code!!!". Now, it's time to present your code as slides with `Code Slides`.
 
 ## Features
 
@@ -38,10 +38,10 @@ Code Slides is configurable. Here's a list of settings you can change:
 ```json
 {
   "code-slides.highlightMode": "Weaken Unhighliht Line",
-  "code-slides.lineWeakenColor": {
+  "code-slides.lineWeakenRenderOptions": {
     "opacity": "0.2"
   },
-  "code-slides.lineStrengthenColor": {
+  "code-slides.lineStrengthenRenderOptions": {
     "backgroundColor": "rgba(255, 0, 0, 0.5)"
   },
   "code-slides.hideStatusBar": "false",
