@@ -1,7 +1,7 @@
 {
   "name": "code-slides",
   "displayName": "Code Slides",
-  "description": "Show you code like slide in vscode",
+  "description": "Present your code as slides in vscode",
   "version": "0.0.2",
   "publisher": "Craster",
   "engines": {
@@ -222,10 +222,12 @@
         },
         {
           "command": "code-slides.openProjectDataFile",
+          "when": "view == codeSlidesView.projects",
           "group": "group1@1"
         },
         {
           "command": "code-slides.deleteAllProject",
+          "when": "view == codeSlidesView.projects",
           "group": "group1@2"
         }
       ],
