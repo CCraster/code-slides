@@ -125,6 +125,10 @@
         "enablement": "!code-slides.playStatusInfo"
       },
       {
+        "command": "code-slides.addIntoSlide",
+        "title": "Code Slides: Add Selections Into a New Slide"
+      },
+      {
         "command": "code-slides.editSlide",
         "title": "Edit Slide",
         "icon": {
@@ -192,6 +196,18 @@
       }
     ],
     "menus": {
+      "editor/context": [
+        {
+          "command": "code-slides.addIntoSlide",
+          "when": "!code-slides.currentOptSlide",
+          "group": "context@-1"
+        },
+        {
+          "command": "code-slides.stopPlayProject",
+          "when": "!code-slides.currentOptSlide",
+          "group": "context@-2"
+        }
+      ],
       "editor/title": [
         {
           "command": "code-slides.addSlideStart",

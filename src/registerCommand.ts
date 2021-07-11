@@ -1,4 +1,4 @@
-import { ExtensionContext, commands, window, workspace } from 'vscode'
+import { ExtensionContext, commands, window, workspace, TextEditor, TextEditorEdit } from 'vscode'
 import * as path from 'path'
 
 import { SlideExplorer } from './explorers/slideExplorer'
@@ -102,8 +102,8 @@ export function registerCommand(
           return text.trim() === ''
             ? 'empty string or all blank is illegal'
             : projects.findIndex((item: any) => item.id === text) !== -1
-            ? 'the project name has been used'
-            : null
+              ? 'the project name has been used'
+              : null
         },
       })
 
@@ -134,8 +134,8 @@ export function registerCommand(
           return text.trim() === ''
             ? 'empty string or all blank is illegal'
             : projects.findIndex((item: any) => item.id === text) !== -1
-            ? 'the project name has been used'
-            : null
+              ? 'the project name has been used'
+              : null
         },
       })
 
@@ -268,10 +268,10 @@ export function registerCommand(
             return text.trim() === ''
               ? 'empty string or all blank is illegal'
               : projects[optProjectIndex].children.findIndex(
-                  (item: any) => item.id === text,
-                ) !== -1
-              ? 'the slide name has been used'
-              : null
+                (item: any) => item.id === text,
+              ) !== -1
+                ? 'the slide name has been used'
+                : null
           },
         })
 
@@ -393,10 +393,10 @@ export function registerCommand(
           return text.trim() === ''
             ? 'empty string or all blank is illegal'
             : projects[parentIndex].children.findIndex(
-                (item: any) => item.title === text,
-              ) !== -1
-            ? 'the slide name has been used'
-            : null
+              (item: any) => item.title === text,
+            ) !== -1
+              ? 'the slide name has been used'
+              : null
         },
       })
 
@@ -610,4 +610,95 @@ export function registerCommand(
       )
     }
   })
+
+  context.subscriptions.push(
+    commands.registerTextEditorCommand(
+      'code-slides.addIntoSlide',
+      async (textEditor: TextEditor, edit: TextEditorEdit, node?: ProjectTreeItem) => {
+        const projects = CodeSlidesProjectData.getProjects()
+        const currentOptSlide = GlobalState.getCurrentOptSlide()
+        let optProjectId = GlobalState.getCurrentOptProjectId()
+
+        // check if there is slide does not finish edit
+        if (currentOptSlide) {
+          const confirmText = 'Abondon'
+          const abondon = await window.showWarningMessage(
+            `There is a slide does not finish edit, abondon that and create a new one?`,
+            { modal: true },
+            confirmText,
+          )
+          if (abondon !== confirmText) {
+            return
+          } else {
+            GlobalState.setCurrentOptSlide(null)
+            unHighlightActiveEditor()
+          }
+        }
+
+        // ensure there is a opt project when add a slide
+        if (node?.id) {
+          GlobalState.setCurrentOptProjectId(node.id)
+          optProjectId = node.id
+        } else if (!optProjectId) {
+          const selectedOptProject: any = await commands.executeCommand(
+            'code-slides.setOptProject',
+          )
+          if (selectedOptProject) {
+            GlobalState.setCurrentOptProjectId(selectedOptProject.id)
+            optProjectId = selectedOptProject.id
+          } else {
+            projects.length &&
+              window.showWarningMessage(
+                `Add slide need to set operation Project first`,
+              )
+            return
+          }
+        }
+
+        const optProjectIndex = projects.findIndex(
+          (item: ProjectTreeItem) => item.id === optProjectId,
+        )
+
+        const result = await window.showInputBox({
+          value: '',
+          placeHolder:
+            'For example: how to use code-slides 1. But not be empty string',
+          validateInput: (text) => {
+            return text.trim() === ''
+              ? 'empty string or all blank is illegal'
+              : projects[optProjectIndex].children.findIndex(
+                (item: any) => item.id === text,
+              ) !== -1
+                ? 'the slide name has been used'
+                : null
+          },
+        })
+
+        if (result !== undefined) {
+          const slide = new ProjectTreeItem(
+            result,
+            false,
+            projects[optProjectIndex].id,
+          )
+          const currentSelection: Array<Array<number>> = []
+          textEditor.selections.forEach((selection) => {
+            currentSelection.push([selection.start.line, selection.end.line])
+          })
+          // give slide a init filePath
+          slide.slideFilePath = textEditor.document.fileName
+          slide.highlightLines = currentSelection
+          projects[optProjectIndex].children.push(slide)
+          CodeSlidesProjectData.setProjects(projects)
+          slideExplorer.treeView.reveal(slide, {
+            expand: true,
+            focus: true,
+          })
+          GlobalState.setCurrentOptSlide(null)
+          window.showInformationMessage(
+            `[Slide ${result}] has been added to [Project ${projects[optProjectIndex].title}]`,
+          )
+        }
+      },
+    ),
+  )
 }
