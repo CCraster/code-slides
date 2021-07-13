@@ -1,4 +1,11 @@
-import { ExtensionContext, commands, window, workspace, TextEditor, TextEditorEdit } from 'vscode'
+import {
+  ExtensionContext,
+  commands,
+  window,
+  workspace,
+  TextEditor,
+  TextEditorEdit,
+} from 'vscode'
 import * as path from 'path'
 
 import { SlideExplorer } from './explorers/slideExplorer'
@@ -27,6 +34,54 @@ async function highlightSlide(
   })
   await openNewEditor(slide.slideFilePath)
   highlightEditor(window.activeTextEditor, slide)
+}
+
+async function checkIfDiscardUnsavedSlides() {
+  const currentOptSlide = GlobalState.getCurrentOptSlide()
+  // check if there is slide does not finish edit
+  if (currentOptSlide) {
+    const confirmText = 'Discard'
+    const discardModal = await window.showWarningMessage(
+      `You have unsaved changes in slide does, do you want to discard changes and create a new one?`,
+      { modal: true },
+      confirmText,
+    )
+    if (discardModal !== confirmText) {
+      return false
+    }
+    GlobalState.setCurrentOptSlide(null)
+    unHighlightActiveEditor()
+  }
+  return true
+}
+
+async function getCurrentOptSlide(projects: Array<ProjectTreeItem>, node?: ProjectTreeItem, ): Promise<number> {
+  let optProjectId = GlobalState.getCurrentOptProjectId()
+  // ensure there is a opt project when add a slide
+  if (node?.id) {
+    GlobalState.setCurrentOptProjectId(node.id)
+    optProjectId = node.id
+  } else if (!optProjectId) {
+    const selectedOptProject: any = await commands.executeCommand(
+      'code-slides.setOptProject',
+    )
+    if (selectedOptProject) {
+      GlobalState.setCurrentOptProjectId(selectedOptProject.id)
+      optProjectId = selectedOptProject.id
+    } else {
+      projects.length &&
+        window.showWarningMessage(
+          `Add slide need to set operation Project first`,
+        )
+      return -1
+    }
+  }
+
+  const optProjectIndex = projects.findIndex(
+    (item: ProjectTreeItem) => item.id === optProjectId,
+  )
+
+  return optProjectIndex
 }
 
 export function registerCommand(
@@ -102,8 +157,8 @@ export function registerCommand(
           return text.trim() === ''
             ? 'empty string or all blank is illegal'
             : projects.findIndex((item: any) => item.id === text) !== -1
-              ? 'the project name has been used'
-              : null
+            ? 'the project name has been used'
+            : null
         },
       })
 
@@ -134,8 +189,8 @@ export function registerCommand(
           return text.trim() === ''
             ? 'empty string or all blank is illegal'
             : projects.findIndex((item: any) => item.id === text) !== -1
-              ? 'the project name has been used'
-              : null
+            ? 'the project name has been used'
+            : null
         },
       })
 
@@ -268,10 +323,10 @@ export function registerCommand(
             return text.trim() === ''
               ? 'empty string or all blank is illegal'
               : projects[optProjectIndex].children.findIndex(
-                (item: any) => item.id === text,
-              ) !== -1
-                ? 'the slide name has been used'
-                : null
+                  (item: any) => item.id === text,
+                ) !== -1
+              ? 'the slide name has been used'
+              : null
           },
         })
 
@@ -393,10 +448,10 @@ export function registerCommand(
           return text.trim() === ''
             ? 'empty string or all blank is illegal'
             : projects[parentIndex].children.findIndex(
-              (item: any) => item.title === text,
-            ) !== -1
-              ? 'the slide name has been used'
-              : null
+                (item: any) => item.title === text,
+              ) !== -1
+            ? 'the slide name has been used'
+            : null
         },
       })
 
@@ -614,50 +669,17 @@ export function registerCommand(
   context.subscriptions.push(
     commands.registerTextEditorCommand(
       'code-slides.addIntoSlide',
-      async (textEditor: TextEditor, edit: TextEditorEdit, node?: ProjectTreeItem) => {
+      async (
+        textEditor: TextEditor,
+        edit: TextEditorEdit,
+        node?: ProjectTreeItem,
+      ) => {
         const projects = CodeSlidesProjectData.getProjects()
-        const currentOptSlide = GlobalState.getCurrentOptSlide()
-        let optProjectId = GlobalState.getCurrentOptProjectId()
-
-        // check if there is slide does not finish edit
-        if (currentOptSlide) {
-          const confirmText = 'Abondon'
-          const abondon = await window.showWarningMessage(
-            `There is a slide does not finish edit, abondon that and create a new one?`,
-            { modal: true },
-            confirmText,
-          )
-          if (abondon !== confirmText) {
-            return
-          } else {
-            GlobalState.setCurrentOptSlide(null)
-            unHighlightActiveEditor()
-          }
+        let res = await checkIfDiscardUnsavedSlides()
+        if (!res) {
+          return
         }
-
-        // ensure there is a opt project when add a slide
-        if (node?.id) {
-          GlobalState.setCurrentOptProjectId(node.id)
-          optProjectId = node.id
-        } else if (!optProjectId) {
-          const selectedOptProject: any = await commands.executeCommand(
-            'code-slides.setOptProject',
-          )
-          if (selectedOptProject) {
-            GlobalState.setCurrentOptProjectId(selectedOptProject.id)
-            optProjectId = selectedOptProject.id
-          } else {
-            projects.length &&
-              window.showWarningMessage(
-                `Add slide need to set operation Project first`,
-              )
-            return
-          }
-        }
-
-        const optProjectIndex = projects.findIndex(
-          (item: ProjectTreeItem) => item.id === optProjectId,
-        )
+        let optProjectIndex = await getCurrentOptSlide(projects, node)
 
         const result = await window.showInputBox({
           value: '',
@@ -667,10 +689,10 @@ export function registerCommand(
             return text.trim() === ''
               ? 'empty string or all blank is illegal'
               : projects[optProjectIndex].children.findIndex(
-                (item: any) => item.id === text,
-              ) !== -1
-                ? 'the slide name has been used'
-                : null
+                  (item: any) => item.id === text,
+                ) !== -1
+              ? 'the slide name has been used'
+              : null
           },
         })
 
