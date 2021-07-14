@@ -4,7 +4,7 @@
   <img width="120px"src="./images/logo.png" alt="logo" />
 </p>
 <p align="center">
-<a href="https://github.com/CCraster/code-slides"><img src="https://img.shields.io/github/languages/top/CCraster/code-slides" alt="License"></a>
+<a href="https://github.com/CCraster/code-slides"><img src="https://img.shields.io/github/languages/top/CCraster/code-slides" alt="Language"></a>
 <a href="https://github.com/CCraster/code-slides/blob/master/LICENSE"><img src="https://img.shields.io/github/license/CCraster/code-slides" alt="License"></a>
 
 </p>

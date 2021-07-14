@@ -55,7 +55,10 @@ async function checkIfDiscardUnsavedSlides() {
   return true
 }
 
-async function getCurrentOptSlide(projects: Array<ProjectTreeItem>, node?: ProjectTreeItem, ): Promise<number> {
+async function getCurrentOptSlide(
+  projects: Array<ProjectTreeItem>,
+  node?: ProjectTreeItem,
+): Promise<number> {
   let optProjectId = GlobalState.getCurrentOptProjectId()
   // ensure there is a opt project when add a slide
   if (node?.id) {
@@ -735,37 +738,52 @@ export function registerCommand(
       const selectedProjectIndex = projects.findIndex(
         (item: ProjectTreeItem) => item.id === node.parentId,
       )
-      
+
       if (!selectedProject) {
         return
       }
 
       const result = await window.showInputBox({
         value: '',
-        placeHolder: 'For example: 5, means move this slide under slide number 5',
+        placeHolder:
+          'For example: 5, means move this slide under slide number 5, while 0 means move top',
         validateInput: (input) => {
-          let trimInput = input.replace(/\s*/g, "")
-          if (/\d+/.test(trimInput) && 0 < parseInt(trimInput) && parseInt(trimInput) <= selectedProject.children.length) {
+          let trimInput = input.replace(/\s*/g, '')
+          if (
+            /\d+/.test(trimInput) &&
+            0 <= parseInt(trimInput) &&
+            parseInt(trimInput) <= selectedProject.children.length
+          ) {
             return null
           }
-          return 'The input should be a number displayed in front of the slide name in its project'
+          return 'The input should be a number displayed in front of the slide name in its project or 0'
         },
       })
 
       if (result !== undefined) {
         let newIndex = parseInt(result)
+        let infoMsg = ''
         const nodeIndex = selectedProject.children.findIndex(
           (item: ProjectTreeItem) => item.id === node.id,
         )
         const slidesInProject = selectedProject.children
-        const moveUnderSlideTitle = slidesInProject[newIndex-1]['title']
-        slidesInProject.splice(newIndex, 0, slidesInProject.splice(nodeIndex, 1)[0]);
 
+        if (newIndex === 0) {
+          infoMsg = `[Slide ${optNodeTitle}] has been moved top`
+        } else {
+          infoMsg = `[Slide ${optNodeTitle}] has been moved under [Slide ${
+            slidesInProject[newIndex - 1]['title']
+          }]`
+        }
+
+        slidesInProject.splice(
+          newIndex,
+          0,
+          slidesInProject.splice(nodeIndex, 1)[0],
+        )
         projects[selectedProjectIndex].children = slidesInProject
         CodeSlidesProjectData.setProjects(projects)
-        window.showInformationMessage(
-          `[Slide ${optNodeTitle}] has been moved under [Slide ${moveUnderSlideTitle}]`,
-        )
+        window.showInformationMessage(infoMsg)
       }
     },
   )

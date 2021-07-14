@@ -12,11 +12,14 @@
   ],
   "keywords": [
     "code",
+    "snippet",
     "slide",
+    "slides",
     "presentation",
     "project",
     "show",
-    "display"
+    "display",
+    "present"
   ],
   "galleryBanner": {
     "color": "#1E1E1E",
@@ -209,12 +212,12 @@
         {
           "command": "code-slides.addIntoSlide",
           "when": "!code-slides.currentOptSlide",
-          "group": "context@-1"
+          "group": "context@-5"
         },
         {
           "command": "code-slides.stopPlayProject",
           "when": "!code-slides.currentOptSlide",
-          "group": "context@-2"
+          "group": "context@-4"
         }
       ],
       "editor/title": [
