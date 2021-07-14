@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1](https://github.com/CCraster/code-slides/compare/v0.1.0...v0.1.1) (2021-07-14)
+
+
+### Bug Fixes
+
+* move icon still display while edit slide ([a7f4332](https://github.com/CCraster/code-slides/commit/a7f43327b0982ac5ae51a10e6ddbb553f79b7418))
+
 ## [0.1.0](https://github.com/CCraster/code-slides/compare/v0.0.2...v0.1.0) (2021-07-14)
 
 
