@@ -311,6 +311,11 @@
           "group": "inline@3"
         },
         {
+          "command": "code-slides.moveSlide",
+          "when": "view == codeSlidesView.projects && viewItem =~ /^slide/",
+          "group": "inline@5"
+        },
+        {
           "command": "code-slides.editSlide",
           "when": "view == codeSlidesView.projects && viewItem =~ /^slide/",
           "group": "group1@1"
@@ -324,11 +329,6 @@
           "command": "code-slides.deleteSlide",
           "when": "view == codeSlidesView.projects && viewItem =~ /^slide$/",
           "group": "group2"
-        },
-        {
-          "command": "code-slides.moveSlide",
-          "when": "view == codeSlidesView.projects && viewItem =~ /^slide$/",
-          "group": "inline@5"
         }
       ]
     },
