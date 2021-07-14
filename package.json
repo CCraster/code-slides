@@ -193,6 +193,15 @@
           "light": "images/light/arrow-right.svg",
           "dark": "images/dark/arrow-right.svg"
         }
+      },
+      {
+        "command": "code-slides.moveSlide",
+        "title": "Move Slide",
+        "icon": {
+          "light": "images/light/move.svg",
+          "dark": "images/dark/move.svg"
+        },
+        "enablement": "!code-slides.playStatusInfo && !code-slides.currentOptSlide"
       }
     ],
     "menus": {
@@ -312,6 +321,11 @@
           "command": "code-slides.deleteSlide",
           "when": "view == codeSlidesView.projects && viewItem =~ /^slide$/",
           "group": "group2"
+        },
+        {
+          "command": "code-slides.moveSlide",
+          "when": "view == codeSlidesView.projects && viewItem =~ /^slide$/",
+          "group": "inline@5"
         }
       ]
     },
