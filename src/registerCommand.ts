@@ -723,4 +723,50 @@ export function registerCommand(
       },
     ),
   )
+
+  commands.registerCommand(
+    'code-slides.moveSlide',
+    async (node: ProjectTreeItem) => {
+      const { title: optNodeTitle, id: optNodeId } = node
+      const projects = CodeSlidesProjectData.getProjects()
+      const selectedProject = projects.find(
+        (item: ProjectTreeItem) => item.id === node.parentId,
+      )
+      const selectedProjectIndex = projects.findIndex(
+        (item: ProjectTreeItem) => item.id === node.parentId,
+      )
+      
+      if (!selectedProject) {
+        return
+      }
+
+      const result = await window.showInputBox({
+        value: '',
+        placeHolder: 'For example: 5, means move this slide under slide number 5',
+        validateInput: (input) => {
+          let trimInput = input.replace(/\s*/g, "")
+          if (/\d+/.test(trimInput) && 0 < parseInt(trimInput) && parseInt(trimInput) <= selectedProject.children.length) {
+            return null
+          }
+          return 'The input should be a number displayed in front of the slide name in its project'
+        },
+      })
+
+      if (result !== undefined) {
+        let newIndex = parseInt(result)
+        const nodeIndex = selectedProject.children.findIndex(
+          (item: ProjectTreeItem) => item.id === node.id,
+        )
+        const slidesInProject = selectedProject.children
+        const moveUnderSlideTitle = slidesInProject[newIndex-1]['title']
+        slidesInProject.splice(newIndex, 0, slidesInProject.splice(nodeIndex, 1)[0]);
+
+        projects[selectedProjectIndex].children = slidesInProject
+        CodeSlidesProjectData.setProjects(projects)
+        window.showInformationMessage(
+          `[Slide ${optNodeTitle}] has been moved under [Slide ${moveUnderSlideTitle}]`,
+        )
+      }
+    },
+  )
 }

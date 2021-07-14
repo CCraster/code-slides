@@ -58,9 +58,12 @@ export class SlideProvider implements TreeDataProvider<ProjectTreeItem> {
     const currentOptSlide = GlobalState.getCurrentOptSlide()
 
     if (!element.isProject) {
+      const slideIndex = this.getParent(element)?.children.findIndex(
+        (item: ProjectTreeItem) => item.id === element.id,
+      )
       return {
         ...element,
-        label: element.title,
+        label: `${slideIndex !== undefined && slideIndex !== -1 ? slideIndex+1: ''}. ${element.title}`,
         iconPath:
           element.parentId === playingStatusInfo?.inPlayingNode?.id &&
           playingStatusInfo?.inPlayingNode?.children[
