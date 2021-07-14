@@ -4,12 +4,19 @@
   <img width="120px"src="./images/logo.png" alt="logo" />
 </p>
 <p align="center">
+<a href="https://marketplace.visualstudio.com/items?itemName=Craster.code-slides"><img src="https://img.shields.io/visual-studio-marketplace/d/craster.code-slides" alt="Downloads"></a>
 <a href="https://github.com/CCraster/code-slides"><img src="https://img.shields.io/github/languages/top/CCraster/code-slides" alt="Language"></a>
 <a href="https://github.com/CCraster/code-slides/blob/master/LICENSE"><img src="https://img.shields.io/github/license/CCraster/code-slides" alt="License"></a>
 
 </p>
 
 "Talk is cheap, show me your code!!!". Now, it's time to present your code as slides with `Code Slides`.
+
+## What's new in Code Slides 0.1.1
+
+- 🎉 Change projects file tree view in Side Bar will `update immediately`
+- 🎉 `Select snippets first` and add slide with command in right click menu
+- 🎉 Support `slide moving` in project
 
 ## Features
 

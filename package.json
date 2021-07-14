@@ -429,10 +429,11 @@
     "pretest": "npm run test-compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
-    "release-major": "standard-version -r major",
-    "release-minor": "standard-version -r minor",
-    "release-patch": "standard-version -r patch",
-    "release-alpha": "standard-version -p alpha"
+    "publish-after-push-with-tags": "git push && git push origin --tags && vsce publish",
+    "release-major": "standard-version -r major && npm run publish-after-push-with-tags",
+    "release-minor": "standard-version -r minor && npm run publish-after-push-with-tags",
+    "release-patch": "standard-version -r patch && npm run publish-after-push-with-tags",
+    "release-alpha": "standard-version -p alpha && npm run publish-after-push-with-tags"
   },
   "devDependencies": {
     "@types/glob": "^7.1.3",
