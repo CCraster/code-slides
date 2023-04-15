@@ -34,7 +34,7 @@
 
 1. Open `Code Slides` at vscode Side Bar.
 2. Create project.
-3. Add one Silde into the project.
+3. Add one slide into the project.
 4. Choose a code snippet you want to highlight in a code file, and click the "Add Slide End" button at Side Bar or Toolbar, so that this code snippet can be saved in the current slide.
 5. Click the play button named "Code Slides: Start Play Project" and start your presentation now!
 
